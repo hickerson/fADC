@@ -1,0 +1,3 @@
+!# /bin/sh
+
+rsync -avu --progress -e ssh /home/daq/data/raw/ kevinh@ferrari.caltech.edu:Data/UCN/UCNb2010/raw/
