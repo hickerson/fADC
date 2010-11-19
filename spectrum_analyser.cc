@@ -21,12 +21,10 @@
 
 // g++ `root-config --cflags` `root-config --libs` spectrum_analyser.cc -o spectrum_analyser
 
-
 /**
  * Authors: Kevin Peter Hickerson
  * Date: Oct 2010
  */
-
 void usage(const char * arg_name) 
 {
 	printf("Usage: %s <signal run number> <background run number>\n", arg_name);
@@ -56,7 +54,6 @@ TF1* FitPedestal(const char *name, TTree *tree, TCut* cut)
 	}
 }
 */
-
 
 int main (int arg_c, char **arg_v)
 {
@@ -99,12 +96,17 @@ int main (int arg_c, char **arg_v)
 */
 		
   	// Construct run filename
-  	char beta_filename[1024];
-  	sprintf(beta_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[1]);
-
-  	char background_filename[1024];
-  	sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
+  	//char beta_filename[1024];
+  	//sprintf(beta_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[1]);
+	// TODO check envs
+  	//char background_filename[1024];
+  	//sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
+  	//sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
  
+	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
+	TString beta_filename(root_data_dir + "run" + arg_v[1] + "_2D.root");
+	TString back_filename(root_data_dir + "run" + arg_v[2] + "_2D.root");
+
   	// Plot options
   	gStyle->SetOptStat(1);
   	gStyle->SetOptFit(1);
@@ -113,29 +115,29 @@ int main (int arg_c, char **arg_v)
   	TFile* beta_file = new TFile(beta_filename);
   	if (beta_file->IsZombie())
   	{
-		printf("File %s not found.\n", beta_filename);
+		printf("File "+beta_filename+"not found.\n");
 		exit(1);
   	}
 
   	TTree* beta_tree = (TTree*)beta_file->Get("allEvents");
   	if (beta_tree == NULL)
   	{
-		printf("TTree not found in beta file %s.\n", beta_filename);
+		printf("TTree not found in beta file "+beta_filename+".\n");
         exit(0);
   	}
 
   	// Open background ntuple
-  	TFile* background_file = new TFile(background_filename);
-  	if (background_file->IsZombie())
+  	TFile* back_file = new TFile(back_filename);
+  	if (back_file->IsZombie())
   	{
-		printf("File %s not found.\n", background_filename);
+		printf("File "+back_filename+" not found.\n");
 		exit(1);
   	}
 
-  	TTree* background_tree = (TTree*)background_file->Get("allEvents");
-  	if (background_tree == NULL)
+  	TTree* back_tree = (TTree*)back_file->Get("allEvents");
+  	if (back_tree == NULL)
   	{
-		printf("TTree not found in background file %s.\n", background_filename);
+		printf("TTree not found in background file "+back_filename+".\n");
         exit(0);
   	}
 
@@ -152,7 +154,9 @@ int main (int arg_c, char **arg_v)
   	TGraphErrors* resg[NUM_PMTS];
 
   	gStyle->SetPalette(1);
-  	gStyle->SetOptStat("");
+  	gStyle->SetOptStat("ne");
+
+	int bin_count = 64;
 
 	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
   		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());
@@ -161,17 +165,37 @@ int main (int arg_c, char **arg_v)
 
 // This will be in a loop soon -->
  	TCut *beta_cut = new TCut("(channel==16) && ((maxSample-pedestal) < 4095) && (area > 0) && (10*(maxSample-pedestal) > area)");
-  	beta_tree->Draw("(maxSample-pedestal):area", *beta_cut);
+	TString draw_cmd = "(maxSample-pedestal):area";
+  	//beta_tree->Draw(draw_cmd, *beta_cut);
+	//back_tree->Draw(draw_cmd, *beta_cut, "same");
 
-	const char * beta_name = "(maxSample-pedestal)";
-	char beta_his_name[1024];
-	sprintf(beta_his_name, "histogram_%s", beta_name);
-	char beta_draw[1024];
-	sprintf(beta_draw, "%s >> %s", beta_name, beta_his_name);
-	TH1F* beta_histogram = new TH1F(beta_name, "Beta Events", 4000, 0, 4000);
-	TCanvas canvas = new TCanvas("Beta spectrum and background", 1920/2,1080/2);
-	beta_tree->Draw(beta_draw, *beta_cut);
-	background_tree->Draw(beta_draw, *beta_cut);
+	//const char * spectrum_data = "(area)";
+	//sprintf(beta_hist_name, "histogram_%s", beta_name);
+	TString beta_hist_name("beta_spectrum_hist");
+	TString back_hist_name("back_spectrum_hist");
+	TString diff_hist_name("diff_spectrum_hist");
+	//char beta_draw[1024];
+	//sprintf(beta_draw, "%s >> %s", beta_name, beta_his_name);
+	TString beta_draw_cmd("(area) >> "+beta_hist_name);
+	TString back_draw_cmd("(area) >> "+back_hist_name);
+	TString diff_draw_cmd("(area) >> "+diff_hist_name);
+	TH1F* beta_hist = new TH1F(beta_hist_name, "Beta Events", bin_count, 0, 4096);
+	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, 4096);
+	TH1F* diff_hist = new TH1F(diff_hist_name, "Background Events", bin_count, 0, 4096);
+	
+	beta_hist->SetLineColor(2);
+	back_hist->SetLineColor(4);
+	diff_hist->SetLineColor(1);
+	//TCanvas canvas = new TCanvas("Beta spectrum and background", 1920/2,1080/2);
+	beta_tree->Draw(beta_draw_cmd, *beta_cut);
+	beta_tree->Draw(diff_draw_cmd, *beta_cut);
+	back_tree->Draw(back_draw_cmd, *beta_cut);
+	
+	diff_hist->Add(back_hist, -1);
+
+	beta_hist->Draw();
+	back_hist->Draw("same");
+	diff_hist->Draw("same");
 	//canvas.Print(
 
 #if 0
