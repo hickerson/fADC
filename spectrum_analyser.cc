@@ -142,11 +142,6 @@ int main (int arg_c, char **arg_v)
   	}
 
   	// Define cuts
-/*
-  TCut *led_cut = new TCut("(int(Sis00) & 128) > 0");           // 129 if east-PMTs on, 161 if GMS-ref also on
-  TCut *pedestal_cut = new TCut("!(int(Sis00)&1)");           // 129 if east-PMTs on, 161 if GMS-ref also on
-*/
-  
   	TH2F* his2D[NUM_PMTS];
   	TProfile* p[NUM_PMTS];
   	TCanvas* c[NUM_PMTS];
@@ -154,34 +149,28 @@ int main (int arg_c, char **arg_v)
   	TGraphErrors* resg[NUM_PMTS];
 
   	gStyle->SetPalette(1);
-  	gStyle->SetOptStat("ne");
+  	gStyle->SetOptStat("");
 
-	int bin_count = 64;
+	int bin_count = 256;
+	int max_area = 4096*5;
 
 	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
   		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());
 	else
   		printf("Number of entries in the tree.%e\n", (double) beta_tree->GetEntries());
 
-// This will be in a loop soon -->
- 	TCut *beta_cut = new TCut("(channel==16) && ((maxSample-pedestal) < 4095) && (area > 0) && (10*(maxSample-pedestal) > area)");
-	TString draw_cmd = "(maxSample-pedestal):area";
-  	//beta_tree->Draw(draw_cmd, *beta_cut);
-	//back_tree->Draw(draw_cmd, *beta_cut, "same");
-
-	//const char * spectrum_data = "(area)";
-	//sprintf(beta_hist_name, "histogram_%s", beta_name);
+	// This will be in a loop soon -->
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
 	TString diff_hist_name("diff_spectrum_hist");
-	//char beta_draw[1024];
-	//sprintf(beta_draw, "%s >> %s", beta_name, beta_his_name);
+ 	TCut *beta_cut = new TCut("(channel==16) && ((maxSample-pedestal) < 4095) && (area > 0)");
+
 	TString beta_draw_cmd("(area) >> "+beta_hist_name);
 	TString back_draw_cmd("(area) >> "+back_hist_name);
 	TString diff_draw_cmd("(area) >> "+diff_hist_name);
-	TH1F* beta_hist = new TH1F(beta_hist_name, "Beta Events", bin_count, 0, 4096);
-	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, 4096);
-	TH1F* diff_hist = new TH1F(diff_hist_name, "Background Events", bin_count, 0, 4096);
+	TH1F* beta_hist = new TH1F(beta_hist_name, "UCN Events", bin_count, 0, max_area);
+	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
+	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
 	
 	beta_hist->SetLineColor(2);
 	back_hist->SetLineColor(4);
