@@ -152,7 +152,7 @@ int main (int arg_c, char **arg_v)
   	gStyle->SetOptStat("");
 
 	int bin_count = 256;
-	int max_area = 4096*5;
+	int max_area = 4096*16;
 
 	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
   		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());

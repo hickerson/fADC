@@ -536,13 +536,15 @@ protected:
 
 void process_file(char* input_filename, RollingWindow* W)
 {
-	// open input file
-    TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
+    // open input file
+    //TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
+    TString raw_dir_name(getenv("UCNb_RAW_DATA_DIR"));
 
-    FILE* input_fp = fopen(dir_name+input_filename, "rb");
+    FILE* input_fp = fopen(raw_dir_name+input_filename, "rb");
     if (!input_fp) {
-		fprintf(stderr, "Unable to open %s: ",  (dir_name+input_filename).Data());
-		perror("");
+		fprintf(stderr, "Unable to open %s: ",  (raw_dir_name+input_filename).Data());
+    	if(raw_dir_name.CompareTo(""))
+			perror("The environmental variable UCNb_RAW_DATA_DIR does not seem to be set.");
 		exit(1);
     }
 	
@@ -627,28 +629,26 @@ void process_file(char* input_filename, RollingWindow* W)
 
 int main(int argc, char *argv[])
 {
-    //printf("begin \n");
     if (argc != 2) {
-		printf("Usage: <input> \n");
+		printf("Usage: <raw data filename> \n");
 		exit(1);
     }
 
 	// open output file
 	//TString dir_save("Z:/UCNb/Processed/");
-	TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
+	//TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
+	TString dir_save(getenv("UCNb_PROCESSED_DATA_DIR"));
 
 	TFile* output_file = new TFile(dir_save+TString(argv[1]).ReplaceAll(".fat","")+"_2D.root", "RECREATE");
 	std::cout << output_file->GetName() << std::endl;
 	
-
 	// rolling window for coincidences within 100 clock cycles (?? what are these units)
 	RollingWindow W(6000);
 	
 	// recorder for all events
 	RecordAllEvents RA;
 	W.addProcessor(&RA);
-
- /*
+/*
 	// 2-way coincidences betweem channels 1 and 2
 	MultiCoincidence MC("chan_16_17");
 	MC.addCoincidentChannel(16);
