@@ -11,6 +11,7 @@
 #include <TStyle.h>
 #include <TApplication.h>
 #include <TF1.h>
+#include <TLatex.h>
 
 // C INCLUDES
 #include <math.h>
@@ -36,15 +37,20 @@ class Spectrum
  * Date: Oct 2010
  */
 
-Long64_t scan_time = Long64_t(5.2E9); 	// ns
-Long64_t max_time = Long64_t(520E9); 	// ns
-Long64_t start_time = Long64_t(0);      // ns
+Long64_t scan_time;
+Long64_t max_time;
+Long64_t start_time;
 
-int time_bin_count = 520/5;
-int area_bin_count = 32;		
-double max_area = 4096*8;               // in multiples 78 fC
-double lower_area_cut = 0;
-double upper_area_cut = max_area;
+int time_bin_count;
+int area_bin_count;
+int time_fine_ratio;
+int area_fine_ratio;
+
+double max_area;
+double lower_area_cut;
+double upper_area_cut;
+double lower_time_cut;
+double upper_time_cut;
 
 float lifetime1_start_time;
 float lifetime1_stop_time;
@@ -56,7 +62,8 @@ void usage(const char * arg_name)
 	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)]\n", arg_name);
 }
 
-int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, TH1F** time_hist)
+int make_historgram(TString filename, TString hist_name, 
+			TH2F** area_time_hist, TH1F** time_hist, TH1F** area_hist)
 {
   	TFile* file = new TFile(filename);
   	if (file->IsZombie())
@@ -77,10 +84,10 @@ int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, 
 	else
   		printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
 
-	*area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", time_bin_count, 
-				   0, scan_time/1E9, area_bin_count, 0, max_area);
-	*time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", 5*time_bin_count, 0, scan_time/1E9);
-	*area_hist = new TH1F(hist_name+"_area_hist", "Visable energy", area_bin_count, max_area);
+	*area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
+				time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
+	*time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", time_fine_ratio*time_bin_count, 0, scan_time/1E9);
+	*area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", area_fine_ratio*area_bin_count, 0, max_area);
 	
 	Long64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
@@ -95,12 +102,18 @@ int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, 
 		if (tree->GetEntry(i) > 0)
 		{
 			Long64_t sample_time = event->peakTime - first_time;
-			if (event->channel == 16 || event->channel == 17 && sample_time < max_time)
+			if (event->channel == 16 && sample_time < max_time)
 			{
 				double cycle_time = ((sample_time - start_time) % scan_time) / 1E9; // seconds
-				(*area_time_hist)->Fill(cycle_time, event->area);
-				if (event->area > lower_area_cut && event->area < upper_area_cut)
+				double charge = event->area;  
+
+				(*area_time_hist)->Fill(cycle_time, charge);
+
+				if (charge > lower_area_cut && charge < upper_area_cut)
 					(*time_hist)->Fill(cycle_time);
+
+				if (cycle_time > lower_time_cut && cycle_time < upper_area_cut)
+					(*area_hist)->Fill(charge);
 				num++;
 			}
 		}
@@ -141,14 +154,19 @@ int main (int arg_c, char **arg_v)
 */
 
 	scan_time = Long64_t(5.2E9); 	// ns
-	start_time = Long64_t(0);      // ns
+	start_time = Long64_t(0);       // ns
 	max_time = Long64_t(520E9); 	// ns
 
-	time_bin_count = 520/10;
-	area_bin_count = 32;		
-	max_area = 4096*8;               // in multiples 78 fC
+	time_bin_count = 100;
+	area_bin_count = 25;		
+	time_fine_ratio = 2;
+	area_fine_ratio = 2;
+
+	max_area = 4096*8;              // in multiples 78 fC
 	lower_area_cut = 0;
 	upper_area_cut = max_area;
+	lower_time_cut = 15;
+	upper_time_cut = 30;
 
 	lifetime1_start_time = 2.5;
 	lifetime1_stop_time = 5.5;
@@ -246,16 +264,19 @@ int main (int arg_c, char **arg_v)
 
 	TH2F* beta_area_time_hist;
 	TH1F* beta_time_hist;
+	TH1F* beta_area_hist;
 	TH2F* back_area_time_hist;
 	TH1F* back_time_hist;
+	TH1F* back_area_hist;
 	TH2F* diff_area_time_hist;
 	TH1F* diff_time_hist;
+	TH1F* diff_area_hist;
 
 	start_time = Long64_t(6.6E9);
-	make_historgram(beta_filename, "beta", &beta_area_time_hist, &beta_time_hist);
-	make_historgram(beta_filename, "diff", &diff_area_time_hist, &diff_time_hist);
+	make_historgram(beta_filename, "beta", &beta_area_time_hist, &beta_time_hist, &beta_area_hist);
+	make_historgram(beta_filename, "diff", &diff_area_time_hist, &diff_time_hist, &diff_area_hist);
 	start_time = Long64_t(15.75E9);
-	make_historgram(back_filename, "back", &back_area_time_hist, &back_time_hist);
+	make_historgram(back_filename, "back", &back_area_time_hist, &back_time_hist, &back_area_hist);
 /*	
 	TH2F* beta_area_v_time_hist = new TH2F(beta_hist_name, "time v. Evis", 
 					  time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
@@ -286,8 +307,9 @@ int main (int arg_c, char **arg_v)
 			std::cout << "error getting entry" << i << std::endl;
 	}
 */
-	diff_time_hist->Add(back_time_hist, -1.0);
 	diff_area_time_hist->Add(back_area_time_hist, -1.0);
+	diff_time_hist->Add(back_time_hist, -1.0);
+	diff_area_hist->Add(back_area_hist, -1.0);
 	
 	TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])+30", lifetime1_start_time, lifetime1_stop_time);
 	TF1 *lifetime2_fit = new TF1("lifetime2_fit", "[0]*exp(-x/[1])", lifetime2_start_time, lifetime2_stop_time);
@@ -307,13 +329,23 @@ int main (int arg_c, char **arg_v)
 	TCanvas* canvas2D = new TCanvas("time_area_hist_canvas", "Beta spectrum and background", 1920/2, 1080/2);
 	diff_area_time_hist->Draw("colz");
 
-	TCanvas* canvas1D = new TCanvas("time_hist_canvas", "Time sequence", 1920/2, 1080/2);
+	TCanvas* time_canvas1D = new TCanvas("time_hist_canvas", "Time sequence", 1920/2, 1080/2);
 	beta_time_hist->SetLineColor(2);
 	back_time_hist->SetLineColor(4);
 	diff_time_hist->SetLineColor(1);
 	beta_time_hist->Draw("");
 	back_time_hist->Draw("same");
 	diff_time_hist->Draw("same");
+	TLatex latex;
+	latex.DrawLatex(200,200, "#tau = ");
+	
+	TCanvas* area_canvas1D = new TCanvas("area_hist_canvas", "Visible energy spectrum", 1920/2, 1080/2);
+	beta_area_hist->SetLineColor(2);
+	back_area_hist->SetLineColor(4);
+	diff_area_hist->SetLineColor(1);
+	beta_area_hist->Draw("");
+	back_area_hist->Draw("same");
+	diff_area_hist->Draw("same");
 
     app.Run();
 
