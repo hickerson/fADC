@@ -19,6 +19,13 @@
 
 #define NUM_PMTS 1
 
+// TODO move to own file...
+class Spectrum
+{
+	TString filename;
+	
+};
+
 // g++ `root-config --cflags` `root-config --libs` spectrum_analyser.cc -o spectrum_analyser
 
 /**
@@ -142,11 +149,13 @@ int main (int arg_c, char **arg_v)
   	}
 
   	// Define cuts
+	/*
   	TH2F* his2D[NUM_PMTS];
   	TProfile* p[NUM_PMTS];
   	TCanvas* c[NUM_PMTS];
   	TGraph* g[NUM_PMTS];
   	TGraphErrors* resg[NUM_PMTS];
+	*/
 
   	gStyle->SetPalette(1);
   	gStyle->SetOptStat("");
@@ -163,7 +172,7 @@ int main (int arg_c, char **arg_v)
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
 	TString diff_hist_name("diff_spectrum_hist");
- 	TCut *beta_cut = new TCut("(channel==16) && ((maxSample-pedestal) < 4095) && (area > 0)");
+ 	TCut *beta_cut = new TCut("(channel==17) && ((maxSample-pedestal) < 4095) && (area > 0)");
 
 	TString beta_draw_cmd("(area) >> "+beta_hist_name);
 	TString back_draw_cmd("(area) >> "+back_hist_name);
@@ -180,7 +189,7 @@ int main (int arg_c, char **arg_v)
 	beta_tree->Draw(diff_draw_cmd, *beta_cut);
 	back_tree->Draw(back_draw_cmd, *beta_cut);
 	
-	diff_hist->Add(back_hist, -1);
+	diff_hist->Add(back_hist, -1.0);
 
 	beta_hist->Draw();
 	back_hist->Draw("same");

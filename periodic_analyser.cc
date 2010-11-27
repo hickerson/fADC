@@ -135,7 +135,6 @@ int main (int arg_c, char **arg_v)
 		exit(1);
   	}
 
-/*
   	int beta_run = atoi(arg_v[1]);
   	if (beta_run == 0)
   	{
@@ -151,7 +150,6 @@ int main (int arg_c, char **arg_v)
 		usage(arg_v[0]);
 		exit(1);
   	}
-*/
 
 	scan_time = Long64_t(5.2E9); 	// ns
 	start_time = Long64_t(0);       // ns
@@ -189,79 +187,13 @@ int main (int arg_c, char **arg_v)
 	}
 	
   	// Construct run filename
-  	//char beta_filename[1024];
-  	//sprintf(beta_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[1]);
-
-	// TODO check envs
-  	//char background_filename[1024];
-  	//sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
-  	//sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	//TString beta_filename(root_data_dir + "run" + arg_v[1] + "_2D.root");
-	TString beta_filename(root_data_dir + arg_v[1]);
-	//TString back_filename(root_data_dir + "run" + arg_v[2] + "_2D.root");
-	TString back_filename(root_data_dir + arg_v[2]);
+	TString beta_filename(root_data_dir + "run" + TString(arg_v[1]) + "_2D.root");
+	//TString beta_filename(root_data_dir + arg_v[1]);
+	TString back_filename(root_data_dir + "run" + TString(arg_v[2]) + "_2D.root");
+	//TString back_filename(root_data_dir + arg_v[2]);
 
   	// Open beta ntuple
-/*
-  	TFile* beta_file = new TFile(beta_filename);
-  	if (beta_file->IsZombie())
-  	{
-		printf("File "+beta_filename+"not found.\n");
-		exit(1);
-  	}
-
-  	TTree* beta_tree = (TTree*)beta_file->Get("allEvents");
-  	if (beta_tree == NULL)
-  	{
-		printf("TTree not found in beta file "+beta_filename+".\n");
-        	exit(0);
-  	}
-  	// Open background ntuple
-  	TFile* back_file = new TFile(back_filename);
-  	if (back_file->IsZombie())
-  	{
-		printf("File "+back_filename+" not found.\n");
-		exit(1);
-  	}
-
-  	TTree* back_tree = (TTree*)back_file->Get("allEvents");
-  	if (back_tree == NULL)
-  	{
-		printf("TTree not found in background file "+back_filename+".\n");
-        	exit(0);
-  	}
-
-*/
-  	// Define cuts
-	/*
-  	TH2F* his2D[NUM_PMTS];
-  	TProfile* p[NUM_PMTS];
-  	TCanvas* c[NUM_PMTS];
-  	TGraph* g[NUM_PMTS];
-  	TGraphErrors* resg[NUM_PMTS];
-	*/
-
-  	// Plot options
-  	gStyle->SetOptStat(1);
-  	gStyle->SetOptFit(1);
-  	gStyle->SetPalette(1);
-  	gStyle->SetOptStat("");
-/*
-	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
-  		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());
-	else
-  		printf("Number of entries in the tree.%e\n", (double) beta_tree->GetEntries());
-*/
-	// This will be in a loop soon -->
-	//TString beta_hist_name("beta_spectrum_hist");
-/*
-	const char * beta_hist_name = "beta_spectrum_hist";
-	const char * time_hist_name = "time_hist";
-	const char * back_hist_name = "back_spectrum_hist";
-	const char * diff_hist_name = "diff_spectrum_hist";
-*/
-
 	TH2F* beta_area_time_hist;
 	TH1F* beta_time_hist;
 	TH1F* beta_area_hist;
@@ -272,66 +204,45 @@ int main (int arg_c, char **arg_v)
 	TH1F* diff_time_hist;
 	TH1F* diff_area_hist;
 
+	// Create and fill ntuples
 	start_time = Long64_t(6.6E9);
 	make_historgram(beta_filename, "beta", &beta_area_time_hist, &beta_time_hist, &beta_area_hist);
 	make_historgram(beta_filename, "diff", &diff_area_time_hist, &diff_time_hist, &diff_area_hist);
 	start_time = Long64_t(15.75E9);
 	make_historgram(back_filename, "back", &back_area_time_hist, &back_time_hist, &back_area_hist);
-/*	
-	TH2F* beta_area_v_time_hist = new TH2F(beta_hist_name, "time v. Evis", 
-					  time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
-	TH1F* beta_time_hist = new TH1F(beta_time_hist_name, "time v. counts", 10*time_bin_count, 0, scan_time/1E9);
-	
-	Long64_t num = 0;
-	NGammaEvent* event = new NGammaEvent();
-        beta_tree->SetBranchAddress("evt", &event);
-	
-	int N = beta_tree->GetEntries();
-	beta_tree->GetEntry(0);
-	Long64_t first_time = event->peakTime;
 
-	for (int i = 0; i < N; i++)
-	{
-		if (beta_tree->GetEntry(i) > 0)
-		{
-			Long64_t sample_time = event->peakTime - first_time;
-			if (event->channel == 16 && sample_time < max_time)
-			{
-				beta_area_v_time->Fill(((sample_time - start_time) % scan_time, event->area)/1E9);
-				if (event->area > lower_area_cut && event->area < upper_area_cut)
-					beta_time_hist->Fill(((sample_time - start_time) % scan_time)/1E9);
-				num++;
-			}
-		}
-		else
-			std::cout << "error getting entry" << i << std::endl;
-	}
-*/
+	// Do background subtraction
 	diff_area_time_hist->Add(back_area_time_hist, -1.0);
 	diff_time_hist->Add(back_time_hist, -1.0);
 	diff_area_hist->Add(back_area_hist, -1.0);
 	
+	// Fit lifetimes to time plot
 	TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])+30", lifetime1_start_time, lifetime1_stop_time);
 	TF1 *lifetime2_fit = new TF1("lifetime2_fit", "[0]*exp(-x/[1])", lifetime2_start_time, lifetime2_stop_time);
 
 	lifetime1_fit->SetParameter(0,160);
 	lifetime1_fit->SetParameter(1,3);
-	//lifetime1_fit->SetParameter(2,10);
 
 	lifetime2_fit->SetParameter(0,40);
 	lifetime2_fit->SetParameter(1,40);
-	//lifetime2_fit->SetParameter(2,5);
+
 	diff_time_hist->Fit(lifetime1_fit, "R");
 	diff_time_hist->Fit(lifetime2_fit, "+R");
 
-	//back_hist->SetLineColor(4);
-	//diff_hist->SetLineColor(1);
+  	// Plot options
+  	gStyle->SetOptStat(1);
+  	gStyle->SetOptFit(1);
+  	gStyle->SetPalette(1);
+  	gStyle->SetOptStat("");
+
+	// Draw 2D histogram
 	TCanvas* canvas2D = new TCanvas("time_area_hist_canvas", "Beta spectrum and background", 1920/2, 1080/2);
 	diff_area_time_hist->Draw("colz");
 
+	// Draw 1D time histogram 
 	TCanvas* time_canvas1D = new TCanvas("time_hist_canvas", "Time sequence", 1920/2, 1080/2);
-	beta_time_hist->SetLineColor(2);
-	back_time_hist->SetLineColor(4);
+	beta_time_hist->SetLineColor(4);
+	back_time_hist->SetLineColor(2);
 	diff_time_hist->SetLineColor(1);
 	beta_time_hist->Draw("");
 	back_time_hist->Draw("same");
@@ -339,9 +250,10 @@ int main (int arg_c, char **arg_v)
 	TLatex latex;
 	latex.DrawLatex(200,200, "#tau = ");
 	
+	// Draw 1D area histogram
 	TCanvas* area_canvas1D = new TCanvas("area_hist_canvas", "Visible energy spectrum", 1920/2, 1080/2);
-	beta_area_hist->SetLineColor(2);
-	back_area_hist->SetLineColor(4);
+	beta_area_hist->SetLineColor(4);
+	back_area_hist->SetLineColor(2);
 	diff_area_hist->SetLineColor(1);
 	beta_area_hist->Draw("");
 	back_area_hist->Draw("same");
