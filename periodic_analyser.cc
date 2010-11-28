@@ -35,6 +35,7 @@ class Spectrum
 /**
  * Authors: Kevin Peter Hickerson
  * Date: Oct 2010
+ *
  */
 
 Long64_t scan_time;
@@ -57,13 +58,18 @@ float lifetime1_stop_time;
 float lifetime2_start_time;
 float lifetime2_stop_time;
 
+bool verbose;
+
 void usage(const char * arg_name) 
 {
 	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)]\n", arg_name);
 }
 
-int make_historgram(TString filename, TString hist_name, 
-			TH2F** area_time_hist, TH1F** time_hist, TH1F** area_hist)
+Long64_t trigger(TTree* tree) {
+	
+}
+
+int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, TH1F** time_hist, TH1F** area_hist)
 {
   	TFile* file = new TFile(filename);
   	if (file->IsZombie())
@@ -73,19 +79,21 @@ int make_historgram(TString filename, TString hist_name,
   	}
 
   	TTree* tree = (TTree*)file->Get("allEvents");
-  	if (tree == NULL)
+  	if (!tree)
   	{
 		printf("TTree not found in beta file "+filename+".\n");
         	exit(1);
   	}
 
-	if ( tree->GetEntries() == (long)tree->GetEntries())
-  		printf("Number of entries in the tree %li.\n", (long) tree->GetEntries());
-	else
-  		printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
+	if ( verbose ) {
+		if ( tree->GetEntries() == (long)tree->GetEntries())
+  			printf("Number of entries in the tree %li.\n", (long) tree->GetEntries());
+		else
+  			printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
+	}
 
 	*area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
-				time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
+				   time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
 	*time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", time_fine_ratio*time_bin_count, 0, scan_time/1E9);
 	*area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", area_fine_ratio*area_bin_count, 0, max_area);
 	
@@ -102,7 +110,7 @@ int make_historgram(TString filename, TString hist_name,
 		if (tree->GetEntry(i) > 0)
 		{
 			Long64_t sample_time = event->peakTime - first_time;
-			if (event->channel == 16 && sample_time < max_time)
+			if (event->channel == 22 && sample_time < max_time)
 			{
 				double cycle_time = ((sample_time - start_time) % scan_time) / 1E9; // seconds
 				double charge = event->area;  
@@ -184,6 +192,11 @@ int main (int arg_c, char **arg_v)
   	if (arg_c > 5) 
   	{
 		max_time = Long64_t(atof(arg_v[5]) * 1E9);
+	}
+
+	for (int i = 3; i < arg_c; i++)
+	{
+		// ...
 	}
 	
   	// Construct run filename
