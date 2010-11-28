@@ -228,7 +228,7 @@ int main (int arg_c, char **arg_v)
 	diff_area_time_hist->Add(back_area_time_hist, -1.0);
 	diff_time_hist->Add(back_time_hist, -1.0);
 	diff_area_hist->Add(back_area_hist, -1.0);
-	
+/*	
 	// Fit lifetimes to time plot
 	TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])+30", lifetime1_start_time, lifetime1_stop_time);
 	TF1 *lifetime2_fit = new TF1("lifetime2_fit", "[0]*exp(-x/[1])", lifetime2_start_time, lifetime2_stop_time);
@@ -241,7 +241,7 @@ int main (int arg_c, char **arg_v)
 
 	diff_time_hist->Fit(lifetime1_fit, "R");
 	diff_time_hist->Fit(lifetime2_fit, "+R");
-
+*/
   	// Plot options
   	gStyle->SetOptStat(1);
   	gStyle->SetOptFit(1);
