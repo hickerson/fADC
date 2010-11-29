@@ -110,7 +110,7 @@ int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, 
 		if (tree->GetEntry(i) > 0)
 		{
 			Long64_t sample_time = event->peakTime - first_time;
-			if (event->channel == 22 && sample_time < max_time)
+			if (event->channel == 23 && sample_time < max_time)
 			{
 				double cycle_time = ((sample_time - start_time) % scan_time) / 1E9; // seconds
 				double charge = event->area;  
@@ -171,13 +171,13 @@ int main (int arg_c, char **arg_v)
 	max_area = 4096*8;              // in multiples 78 fC
 	lower_area_cut = 0;
 	upper_area_cut = max_area;
-	lower_time_cut = 15;
-	upper_time_cut = 30;
+	lower_time_cut = 1;
+	upper_time_cut = 5.2;
 
 	lifetime1_start_time = 2.5;
 	lifetime1_stop_time = 5.5;
-	lifetime2_start_time = 7;
-	lifetime2_stop_time = 25;
+	lifetime2_start_time = 1;
+	lifetime2_stop_time = 5;
 
   	if (arg_c > 3) 
   	{
@@ -218,30 +218,33 @@ int main (int arg_c, char **arg_v)
 	TH1F* diff_area_hist;
 
 	// Create and fill ntuples
-	start_time = Long64_t(6.6E9);
+	start_time = Long64_t(4E9);
 	make_historgram(beta_filename, "beta", &beta_area_time_hist, &beta_time_hist, &beta_area_hist);
 	make_historgram(beta_filename, "diff", &diff_area_time_hist, &diff_time_hist, &diff_area_hist);
-	start_time = Long64_t(15.75E9);
+	start_time = Long64_t(1.74E9);
 	make_historgram(back_filename, "back", &back_area_time_hist, &back_time_hist, &back_area_hist);
 
 	// Do background subtraction
 	diff_area_time_hist->Add(back_area_time_hist, -1.0);
 	diff_time_hist->Add(back_time_hist, -1.0);
 	diff_area_hist->Add(back_area_hist, -1.0);
-/*	
+
 	// Fit lifetimes to time plot
-	TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])+30", lifetime1_start_time, lifetime1_stop_time);
+	//TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])+30", lifetime1_start_time, lifetime1_stop_time);
 	TF1 *lifetime2_fit = new TF1("lifetime2_fit", "[0]*exp(-x/[1])", lifetime2_start_time, lifetime2_stop_time);
 
+/*
 	lifetime1_fit->SetParameter(0,160);
 	lifetime1_fit->SetParameter(1,3);
-
-	lifetime2_fit->SetParameter(0,40);
-	lifetime2_fit->SetParameter(1,40);
-
-	diff_time_hist->Fit(lifetime1_fit, "R");
-	diff_time_hist->Fit(lifetime2_fit, "+R");
 */
+	lifetime2_fit->SetParameter(0,20);
+	lifetime2_fit->SetParameter(1,4);
+
+/*
+	diff_time_hist->Fit(lifetime1_fit, "R");
+*/
+	diff_time_hist->Fit(lifetime2_fit, "+R");
+
   	// Plot options
   	gStyle->SetOptStat(1);
   	gStyle->SetOptFit(1);
@@ -254,9 +257,10 @@ int main (int arg_c, char **arg_v)
 
 	// Draw 1D time histogram 
 	TCanvas* time_canvas1D = new TCanvas("time_hist_canvas", "Time sequence", 1920/2, 1080/2);
-	beta_time_hist->SetLineColor(4);
-	back_time_hist->SetLineColor(2);
+	beta_time_hist->SetLineColor(2);
+	back_time_hist->SetLineColor(4);
 	diff_time_hist->SetLineColor(1);
+	beta_time_hist->SetAxisRange(0,2000,"Y");
 	beta_time_hist->Draw("");
 	back_time_hist->Draw("same");
 	diff_time_hist->Draw("same");
@@ -265,8 +269,8 @@ int main (int arg_c, char **arg_v)
 	
 	// Draw 1D area histogram
 	TCanvas* area_canvas1D = new TCanvas("area_hist_canvas", "Visible energy spectrum", 1920/2, 1080/2);
-	beta_area_hist->SetLineColor(4);
-	back_area_hist->SetLineColor(2);
+	beta_area_hist->SetLineColor(2);
+	back_area_hist->SetLineColor(4);
 	diff_area_hist->SetLineColor(1);
 	beta_area_hist->Draw("");
 	back_area_hist->Draw("same");
