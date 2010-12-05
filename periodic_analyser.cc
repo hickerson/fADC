@@ -41,6 +41,7 @@ class Spectrum
 Long64_t scan_time;
 Long64_t max_time;
 Long64_t start_time;
+Long64_t background_start_time;
 
 int time_bin_count;
 int area_bin_count;
@@ -162,6 +163,7 @@ int main (int arg_c, char **arg_v)
 	scan_time = Long64_t(5.2E9); 	// ns
 	start_time = Long64_t(0);       // ns
 	max_time = Long64_t(520E9); 	// ns
+	background_start_time = Long64_t(520E9); 	// ns
 
 	time_bin_count = 100;
 	area_bin_count = 25;		
@@ -171,8 +173,8 @@ int main (int arg_c, char **arg_v)
 	max_area = 4096*8;              // in multiples 78 fC
 	lower_area_cut = 0;
 	upper_area_cut = max_area;
-	lower_time_cut = 1;
-	upper_time_cut = 5.2;
+	lower_time_cut = 10;
+	upper_time_cut = 60;
 
 	lifetime1_start_time = 2.5;
 	lifetime1_stop_time = 5.5;
@@ -192,6 +194,11 @@ int main (int arg_c, char **arg_v)
   	if (arg_c > 5) 
   	{
 		max_time = Long64_t(atof(arg_v[5]) * 1E9);
+	}
+
+  	if (arg_c > 6) 
+  	{
+		background_start_time = Long64_t(atof(arg_v[5]) * 1E9);
 	}
 
 	for (int i = 3; i < arg_c; i++)
@@ -218,10 +225,9 @@ int main (int arg_c, char **arg_v)
 	TH1F* diff_area_hist;
 
 	// Create and fill ntuples
-	start_time = Long64_t(4E9);
 	make_historgram(beta_filename, "beta", &beta_area_time_hist, &beta_time_hist, &beta_area_hist);
 	make_historgram(beta_filename, "diff", &diff_area_time_hist, &diff_time_hist, &diff_area_hist);
-	start_time = Long64_t(1.74E9);
+	start_time = background_start_time;
 	make_historgram(back_filename, "back", &back_area_time_hist, &back_time_hist, &back_area_hist);
 
 	// Do background subtraction
