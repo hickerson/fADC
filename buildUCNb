@@ -2,4 +2,6 @@ export ROOTSYS=/opt/root
 export PATH=$ROOTSYS/bin:$PATH
 rootcint -f Dictionary.cxx -c NGammaEvent.h LinkDef.h
 g++ -O0 -g `root-config --cflags` analysisUCNb.cxx Dictionary.cxx -o analysisUCNb `root-config --libs` 
-g++ `root-config --cflags` `root-config --libs` spectrum_analyser.cc -o spectrum_analyser
+g++ `root-config --cflags` `root-config --libs` spectrum_analyser.cc Dictionary.cxx -o spectrum_analyser
+g++ `root-config --cflags` `root-config --libs` periodic_analyser.cc Dictionary.cxx -o periodic_analyser
+git add analysisUCNb.cxx spectrum_analyser.cc periodic_analyser.cc

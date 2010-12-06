@@ -14,7 +14,8 @@
 #include <string.h>
 #define G__ANSIHEADER
 #define G__DICTIONARY
-#include "G__ci.h"
+#define G__PRIVATE_GVALUE
+#include "cint/G__ci.h"
 extern "C" {
 extern void G__cpp_setup_tagtableDictionary();
 extern void G__cpp_setup_inheritanceDictionary();
@@ -30,6 +31,9 @@ extern void G__set_cpp_environmentDictionary();
 #include "TObject.h"
 #include "TMemberInspector.h"
 #include "NGammaEvent.h"
+#include <algorithm>
+namespace std { }
+using namespace std;
 
 #ifndef G__MEMFUNCBODY
 #endif
@@ -37,6 +41,9 @@ extern void G__set_cpp_environmentDictionary();
 extern G__linked_taginfo G__DictionaryLN_TClass;
 extern G__linked_taginfo G__DictionaryLN_TBuffer;
 extern G__linked_taginfo G__DictionaryLN_TMemberInspector;
+extern G__linked_taginfo G__DictionaryLN_vectorlEROOTcLcLTSchemaHelpercOallocatorlEROOTcLcLTSchemaHelpergRsPgR;
+extern G__linked_taginfo G__DictionaryLN_reverse_iteratorlEvectorlEROOTcLcLTSchemaHelpercOallocatorlEROOTcLcLTSchemaHelpergRsPgRcLcLiteratorgR;
+extern G__linked_taginfo G__DictionaryLN_iteratorlEbidirectional_iterator_tagcOTObjectmUcOlongcOconstsPTObjectmUmUcOconstsPTObjectmUaNgR;
 extern G__linked_taginfo G__DictionaryLN_NGammaEvent;
 
 /* STUB derived class for protected member access */

@@ -23,6 +23,8 @@
 
 #define NUM_PMTS 1
 
+using namespace std;
+
 // TODO move to own file...
 class Spectrum
 {
@@ -113,17 +115,22 @@ int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, 
 			Long64_t sample_time = event->peakTime - first_time;
 			if (event->channel == 23 && sample_time < max_time)
 			{
-				double cycle_time = ((sample_time - start_time) % scan_time) / 1E9; // seconds
-				double charge = event->area;  
+				double cycle_time = ((sample_time + scan_time - start_time) % scan_time) / 1E9; // seconds
+				double area = event->area;  
+				double pulse_height = event->maxSample;  
+				double charge = area;
 
-				(*area_time_hist)->Fill(cycle_time, charge);
+				if (pulse_height < 4096) {
+					(*area_time_hist)->Fill(cycle_time, charge);
 
-				if (charge > lower_area_cut && charge < upper_area_cut)
-					(*time_hist)->Fill(cycle_time);
+					if (charge > lower_area_cut && charge < upper_area_cut)
+						(*time_hist)->Fill(cycle_time);
 
-				if (cycle_time > lower_time_cut && cycle_time < upper_area_cut)
-					(*area_hist)->Fill(charge);
-				num++;
+					if (cycle_time > lower_time_cut && cycle_time < upper_area_cut)
+						(*area_hist)->Fill(charge);
+
+					num++;
+				}
 			}
 		}
 		else
@@ -163,23 +170,24 @@ int main (int arg_c, char **arg_v)
 	scan_time = Long64_t(5.2E9); 	// ns
 	start_time = Long64_t(0);       // ns
 	max_time = Long64_t(520E9); 	// ns
-	background_start_time = Long64_t(520E9); 	// ns
+	background_start_time = Long64_t(0); 	// ns
 
-	time_bin_count = 100;
-	area_bin_count = 25;		
+	time_bin_count = 40;
+	area_bin_count = 100;		
 	time_fine_ratio = 2;
 	area_fine_ratio = 2;
 
+	//max_area = 4096;
 	max_area = 4096*8;              // in multiples 78 fC
 	lower_area_cut = 0;
 	upper_area_cut = max_area;
-	lower_time_cut = 10;
-	upper_time_cut = 60;
+	lower_time_cut = 1;
+	upper_time_cut = 38;
 
 	lifetime1_start_time = 2.5;
 	lifetime1_stop_time = 5.5;
-	lifetime2_start_time = 1;
-	lifetime2_stop_time = 5;
+	lifetime2_start_time = 5;
+	lifetime2_stop_time = 40;
 
   	if (arg_c > 3) 
   	{
@@ -198,7 +206,7 @@ int main (int arg_c, char **arg_v)
 
   	if (arg_c > 6) 
   	{
-		background_start_time = Long64_t(atof(arg_v[5]) * 1E9);
+		background_start_time = Long64_t(atof(arg_v[6]) * 1E9);
 	}
 
 	for (int i = 3; i < arg_c; i++)
@@ -208,9 +216,9 @@ int main (int arg_c, char **arg_v)
 	
   	// Construct run filename
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	TString beta_filename(root_data_dir + "run" + TString(arg_v[1]) + "_2D.root");
+	TString beta_filename(root_data_dir + "run" + TString(arg_v[1]) + ".root");
 	//TString beta_filename(root_data_dir + arg_v[1]);
-	TString back_filename(root_data_dir + "run" + TString(arg_v[2]) + "_2D.root");
+	TString back_filename(root_data_dir + "run" + TString(arg_v[2]) + ".root");
 	//TString back_filename(root_data_dir + arg_v[2]);
 
   	// Open beta ntuple
@@ -225,9 +233,11 @@ int main (int arg_c, char **arg_v)
 	TH1F* diff_area_hist;
 
 	// Create and fill ntuples
+	cout << "start_time " << start_time/1e9 << endl;
 	make_historgram(beta_filename, "beta", &beta_area_time_hist, &beta_time_hist, &beta_area_hist);
 	make_historgram(beta_filename, "diff", &diff_area_time_hist, &diff_time_hist, &diff_area_hist);
 	start_time = background_start_time;
+	cout << "background start_time " << start_time/1e9 << endl;
 	make_historgram(back_filename, "back", &back_area_time_hist, &back_time_hist, &back_area_hist);
 
 	// Do background subtraction
@@ -266,7 +276,7 @@ int main (int arg_c, char **arg_v)
 	beta_time_hist->SetLineColor(2);
 	back_time_hist->SetLineColor(4);
 	diff_time_hist->SetLineColor(1);
-	beta_time_hist->SetAxisRange(0,2000,"Y");
+	beta_time_hist->SetAxisRange(0,1000,"Y");
 	beta_time_hist->Draw("");
 	back_time_hist->Draw("same");
 	diff_time_hist->Draw("same");
@@ -281,6 +291,16 @@ int main (int arg_c, char **arg_v)
 	beta_area_hist->Draw("");
 	back_area_hist->Draw("same");
 	diff_area_hist->Draw("same");
+
+	double time_window = upper_time_cut - lower_time_cut;
+	double live_time = time_window * max_time / scan_time;
+	double back_counts = diff_area_hist->Integral();
+	double beta_counts = diff_area_hist->Integral();
+	double diff_counts = diff_area_hist->Integral();
+	cout << "diff counts: " << diff_counts << endl;
+	cout << "time window: " << time_window << " sec" << endl;
+	cout << "live time: " << live_time << " sec" << endl;
+	cout << "diff rate " << diff_counts / live_time << " Hz" << endl;
 
     app.Run();
 

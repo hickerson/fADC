@@ -537,9 +537,12 @@ void process_file(char* input_filename, RollingWindow* W)
     //TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
     TString raw_dir_name(getenv("UCNb_RAW_DATA_DIR"));
 
-    FILE* input_fp = fopen(raw_dir_name+input_filename, "rb");
+    FILE* input_fp = fopen(input_filename, "rb");    // try full path name or base directory first
     if (!input_fp) {
-		fprintf(stderr, "Unable to open %s: ",  (raw_dir_name+input_filename).Data());
+    	input_fp = fopen(raw_dir_name+input_filename, "rb");
+    }
+    if (!input_fp) {
+		fprintf(stderr, "Unable to open %s: \n",  (raw_dir_name+input_filename).Data());
     	if(raw_dir_name.CompareTo(""))
 			perror("The environmental variable UCNb_RAW_DATA_DIR does not seem to be set.");
 		exit(1);
@@ -638,7 +641,7 @@ int main(int argc, char *argv[])
 	//TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
 	TString dir_save(getenv("UCNb_PROCESSED_DATA_DIR"));
 
-	TFile* output_file = new TFile(dir_save+TString(argv[1]).ReplaceAll(".fat","")+"_2D.root", "RECREATE");
+	TFile* output_file = new TFile(dir_save+TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
 	std::cout << output_file->GetName() << std::endl;
 	
 	// rolling window for coincidences within 100 clock cycles (?? what are these units)
