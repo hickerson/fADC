@@ -29,13 +29,18 @@ ClassImp(NGammaEvent)
 #define NBOARD 4 
 #define CHANNELS_PER_BOARD 8	// canonical channels/board
 #define TIME_CHUNK 10			// number of seconds of data to process at a time
-#define PEDESTAL_START 15 // starting point for averaging
+#define PEDESTAL_START 15 		// starting point for averaging
 
 // Boards 1/2 16ns/clock tick, 
 // Board 3: 10x slower 
 // later changed to variable on all boards
 
-const float k_clockMul[NBOARD][CHANNELS_PER_BOARD] = { {4,4,4,4,4,4,4,4}, {4,4,4,4,4,4,4,4}, {4,4,4,4,4,4,4,4}, {120,120,120,120,120,120,120,120}};
+const float k_clockMul[NBOARD][CHANNELS_PER_BOARD] = { 
+	{4,4,4,4,4,4,4,4}, 
+	{4,4,4,4,4,4,4,4}, 
+	{4,4,4,4,4,4,4,4}, 
+	{120,120,120,120,120,120,120,120}
+};
 
 /// time-sorting comparison
 bool compareEventsByTime(NGammaEvent p1, NGammaEvent p2) { return p1.peakTime < p2.peakTime; }
@@ -43,9 +48,12 @@ bool compareEventsByTime(NGammaEvent p1, NGammaEvent p2) { return p1.peakTime < 
 /// pulse shape fit functions
 double fit_func(double *x, double *par)
 {
-  if (x[0] < par[0]) return par[2];
-  else if (x[0] < par[1]) return par[2] + (x[0]-par[0])/(par[1]-par[0])*(par[3]-par[2]);
-  else return par[3] + (x[0]-par[1])*par[4];
+  if (x[0] < par[0]) 
+	return par[2];
+  else if (x[0] < par[1]) 
+	return par[2] + (x[0]-par[0])/(par[1]-par[0])*(par[3]-par[2]);
+  else 
+	return par[3] + (x[0]-par[1])*par[4];
 }
 
 /// class for handling board readout
