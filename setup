@@ -1,0 +1,17 @@
+#! /bin/sh
+
+if [ $# -lt 1 ]
+then
+	echo "setup what?"
+    echo "usage: setup <computer>"
+	exit 1
+fi
+
+case $1 in
+	ferrari)
+		echo "setting up for ferrari..."
+		export UCNb_RAW_DATA_DIR=/home/ucnb/data/raw
+		echo UCNb_RAW_DATA_DIR=/home/ucnb/data/raw
+		export UCNb_PROCESSED_DATA_DIR=/home/ucnb/data/processed
+		echo UCNb_PROCESSED_DATA_DIR=/home/ucnb/data/processed
+esac

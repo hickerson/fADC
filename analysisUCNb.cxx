@@ -29,8 +29,7 @@ ClassImp(NGammaEvent)
 #define NBOARD 4 
 #define CHANNELS_PER_BOARD 8	// canonical channels/board
 #define TIME_CHUNK 10			// number of seconds of data to process at a time
-#define PEDESTAL_START 5 // starting point for averaging
-#define PEDESTAL_SAMPLE_COUNT 15 // number of samples used for pedestal averaging
+#define PEDESTAL_START 15 // starting point for averaging
 
 // Boards 1/2 16ns/clock tick, 
 // Board 3: 10x slower 
@@ -223,15 +222,13 @@ public:
 		
 		// find the pedestal by averaging the first four samples
 		// find the pedestal by averaging the five samples close to the peak
-		double pedestal = 0;
-		for (int i = 0; i < PEDESTAL_SAMPLE_COUNT; i++)
-			pedestal += samples[PEDESTAL_START + i];
-		pedestal /= PEDESTAL_SAMPLE_COUNT;
+		double pedestal = (samples[PEDESTAL_START] + samples[1+PEDESTAL_START] + samples[2+PEDESTAL_START] + samples[3+PEDESTAL_START]+samples[5+PEDESTAL_START]) / 5.0;
 		
 		// Add up the total area
 		double area = 0;
 		//for(std::vector<int>::iterator it = std::max(maxSample +20,samples.begin()); it < std::min(maxSample + 81,samples.end()); it++)
-		for(std::vector<int>::iterator it = samples.begin(); it < samples.end(); it++)
+		for(std::vector<int>::iterator it = samples.begin(); 
+			it < samples.end(); it++)
 			area += (*it - pedestal)*clockMul[channel-baseNumber];
 		
 		// find interpolated peak around max using 3-point parabola
@@ -326,7 +323,7 @@ public:
 				}
 
 				double threshold = 0.4;
-				for (int i = (int)dEdx_min_t; i >= 0; i--)
+				for (int i = dEdx_min_t; i >= 0; i--)
                                 {
                                         if ( h0_slope->GetBinContent(i+1) > threshold * dEdx_min )
                                         {
@@ -335,7 +332,7 @@ public:
 						break;
                                         }
                                 }
-                                for (int i = (int)dEdx_min_t; i < h0_slope->GetNbinsX(); i++)
+                                for (int i = dEdx_min_t; i < h0_slope->GetNbinsX(); i++)
                                 {
                                         if ( h0_slope->GetBinContent(i+1) > threshold * dEdx_min )
                                         {
@@ -457,8 +454,8 @@ public:
 		// fill event data
 		NGammaEvent ev;
 		ev.channel = channel;
-		ev.triggerTime = Long64_t(t0 * clockMul[channel-baseNumber]);
-		ev.peakTime = Long64_t((t0 + int(maxSample-samples.begin())) * clockMul[channel-baseNumber]);
+		ev.triggerTime = t0 * clockMul[channel-baseNumber];
+		ev.peakTime = (t0 + int(maxSample-samples.begin())) * clockMul[channel-baseNumber];
 		ev.peakTimeInterp = (t0 + centerInterp) * clockMul[channel-baseNumber];
 		ev.pedestal = pedestal;
 		ev.minSample = *minSample;
@@ -531,20 +528,21 @@ protected:
 };
 
 
+
+
+
+
+
+
 void process_file(char* input_filename, RollingWindow* W)
 {
-    // open input file
-    //TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
-    TString raw_dir_name(getenv("UCNb_RAW_DATA_DIR"));
+	// open input file
+    TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
 
-    FILE* input_fp = fopen(input_filename, "rb");    // try full path name or base directory first
+    FILE* input_fp = fopen(dir_name+input_filename, "rb");
     if (!input_fp) {
-    	input_fp = fopen(raw_dir_name+input_filename, "rb");
-    }
-    if (!input_fp) {
-		fprintf(stderr, "Unable to open %s: \n",  (raw_dir_name+input_filename).Data());
-    	if(raw_dir_name.CompareTo(""))
-			perror("The environmental variable UCNb_RAW_DATA_DIR does not seem to be set.");
+		fprintf(stderr, "Unable to open %s: ",  (dir_name+input_filename).Data());
+		perror("");
 		exit(1);
     }
 	
@@ -559,7 +557,7 @@ void process_file(char* input_filename, RollingWindow* W)
 	printf("Reading from file '%s'...\n",input_filename);
 	int event_number = 0;
 	std::deque<NGammaEvent> events;
-    	while (!feof(input_fp)) {
+    while (!feof(input_fp)) {
 		
 		double blockStartTime = -1;		// start time [s] of current data block
 		double packetTime = -1;			// time [s] of most recently read packet
@@ -629,28 +627,28 @@ void process_file(char* input_filename, RollingWindow* W)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
-		printf("Usage: <raw data filename> \n");
+    //printf("begin \n");
+    if (argc != 2) {
+		printf("Usage: <input> \n");
 		exit(1);
     }
 
-    for (int i = 1; i < argc; i++)
-    {
 	// open output file
 	//TString dir_save("Z:/UCNb/Processed/");
-	//TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
-	TString dir_save(getenv("UCNb_PROCESSED_DATA_DIR"));
+	TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
 
-	TFile* output_file = new TFile(dir_save+TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
+	TFile* output_file = new TFile(dir_save+TString(argv[1]).ReplaceAll(".fat","")+"_2D.root", "RECREATE");
 	std::cout << output_file->GetName() << std::endl;
 	
+
 	// rolling window for coincidences within 100 clock cycles (?? what are these units)
 	RollingWindow W(6000);
 	
 	// recorder for all events
 	RecordAllEvents RA;
 	W.addProcessor(&RA);
-/*
+
+ /*
 	// 2-way coincidences betweem channels 1 and 2
 	MultiCoincidence MC("chan_16_17");
 	MC.addCoincidentChannel(16);
@@ -689,12 +687,12 @@ int main(int argc, char *argv[])
             }
         }
 */
-        // scan events in input file
-        process_file(argv[1], &W);
+    // scan events in input file
+    process_file(argv[1], &W);
 	
 	// close output file
-        output_file->Write();
-        output_file->Close();
-    }
-    return 0;
+    output_file->Write();
+    output_file->Close();
+	
+	return 0;
 }
