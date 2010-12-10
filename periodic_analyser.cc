@@ -77,14 +77,14 @@ int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, 
   	TFile* file = new TFile(filename);
   	if (file->IsZombie())
   	{
-		printf("File "+filename+"not found.\n");
+		cout << "File "<<filename<<"not found."<<endl;
 		exit(1);
   	}
 
   	TTree* tree = (TTree*)file->Get("allEvents");
   	if (!tree)
   	{
-		printf("TTree not found in beta file "+filename+".\n");
+		cout<<"TTree not found in beta file "<<filename<<endl;
         	exit(1);
   	}
 
@@ -134,10 +134,10 @@ int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, 
 			}
 		}
 		else
-			std::cout << "error getting entry" << i << std::endl;
+			cout << "error getting entry" << i << endl;
 	}
 
-	printf("Number of entries filled is %d.\n", num);
+	cout << "Number of entries filled is " << num << "." << endl;
 	return num;
 }
 

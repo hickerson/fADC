@@ -1,0 +1,67 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+then
+	echo "Usage:${0##*/} [-f|--force] [-a|--all] <run number>"
+	exit 1
+fi
+
+# defaults
+FORCE=false
+ALL=false
+CMD_LOG_FILE=command-list-file.log
+
+while [ $# -gt 0 ]
+do
+	case $1 in
+		-*a*|--all)
+			ALL=true
+			i=1
+			;;
+		-*f*|--force)
+			FORCE=true
+			;;
+		-*)
+			echo "unrecognized option"
+			;;
+		*[!0-9]*)
+			echo "Need a run number"
+			exit 1
+			;;
+		*)
+			i=$1
+			echo i
+			;;
+	esac
+	shift
+done
+	
+if [ $ALL ] 
+then 
+	MAX=100000
+else
+	MAX=`expr $i + 1`
+fi
+
+if [ -f $CMD_LOG_FILE ]
+then
+	rm $CMD_LOG_FILE
+fi
+
+while [ $i -lt $MAX ]
+do
+	if [ -r $UCNb_RAW_DATA_DIR/run$i.fat ]
+	then
+		if [ $FORCE ]
+		then
+			rm -f $UCN_PROCESSED_DATA_DIR/run$i.root
+		fi
+		if [ ! -f $UCN_PROCESSED_DATA_DIR/run$i.root ]
+		then
+			echo "./analysisUCNb run$i.fat" >> $CMD_LOG_FILE
+		fi
+	fi
+	(( i++ ))
+done
+
+parallel < $CMD_LOG_FILE

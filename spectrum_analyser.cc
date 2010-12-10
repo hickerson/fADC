@@ -19,6 +19,8 @@
 
 #define NUM_PMTS 1
 
+using namespace std;
+
 // TODO move to own file...
 class Spectrum
 {
@@ -122,14 +124,15 @@ int main (int arg_c, char **arg_v)
   	TFile* beta_file = new TFile(beta_filename);
   	if (beta_file->IsZombie())
   	{
-		printf("File "+beta_filename+"not found.\n");
+		//printf("File "+beta_filename+"not found.\n");
+		cout << "File " << beta_filename << "not found." << endl;
 		exit(1);
   	}
 
   	TTree* beta_tree = (TTree*)beta_file->Get("allEvents");
   	if (beta_tree == NULL)
   	{
-		printf("TTree not found in beta file "+beta_filename+".\n");
+		cout << "TTree not found in beta file " << beta_filename << endl;
         exit(0);
   	}
 
@@ -137,14 +140,14 @@ int main (int arg_c, char **arg_v)
   	TFile* back_file = new TFile(back_filename);
   	if (back_file->IsZombie())
   	{
-		printf("File "+back_filename+" not found.\n");
+		cout << "File " << back_filename << " not found." << endl;
 		exit(1);
   	}
 
   	TTree* back_tree = (TTree*)back_file->Get("allEvents");
   	if (back_tree == NULL)
   	{
-		printf("TTree not found in background file "+back_filename+".\n");
+		cout << "TTree not found in background file " << back_filename << endl;
         exit(0);
   	}
 
