@@ -544,8 +544,9 @@ void process_file(char* input_filename, RollingWindow* W)
     }
 */
     if (!input_fp) {
-		fprintf(stderr, "Unable to open %s: \n",  (raw_dir_name+"/"+input_filename).Data());
+		fprintf(stderr, "Unable to open %s: \n", input_filename);
 /*
+		fprintf(stderr, "Unable to open %s: \n",  TString(raw_dir_name+"/"+input_filename).Data());
     	if(raw_dir_name.CompareTo(""))
 			perror("The environmental variable UCNb_RAW_DATA_DIR does not seem to be set.");
 */

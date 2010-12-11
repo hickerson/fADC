@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <math.h>
 #include "TH1.h"
 #include "TH2.h"
 #include "TFile.h"
@@ -177,7 +178,7 @@ void display(char *filename, int channel_1 = -1)
 
  	  if (board_index == 0 && channel == 2) of_file << timestamp << "  " << timestamp_pre_entry[board_index][channel] << endl;
 	  if (timestamp < timestamp_pre_entry[board_index][channel] && 
-		  abs(timestamp - timestamp_pre_entry[board_index][channel]) > 0.95*k_timestamp_offset &&
+		  fabs(timestamp - timestamp_pre_entry[board_index][channel]) > 0.95*k_timestamp_offset &&
 		  timestamp_entry_count[board_index][channel] > 300 ) {
 	    timestamp_entry_count[board_index][channel] = 0;
 		timestamp_shift[board_index][channel] += k_timestamp_offset;
@@ -185,7 +186,7 @@ void display(char *filename, int channel_1 = -1)
  	    
 		if (board_index == 0 && channel == 2) {
 		  of_file << " * " << timestamp << "  " << timestamp_pre_entry[board_index][channel] 
-		       << "  " << abs(timestamp - timestamp_pre_entry[board_index][channel])*1.0/k_timestamp_offset
+		       << "  " << fabs(timestamp - timestamp_pre_entry[board_index][channel])*1.0/k_timestamp_offset
 			   << endl;
           printf("timestamp for board %i channel %i reset ... \n", board, channel);
           of_file << "timestamp for board " << board << " channel " << channel << " reset ... " << endl;

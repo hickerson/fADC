@@ -1,0 +1,33 @@
+#! /bin/sh
+
+if [ $# -lt 1 ]
+then
+	echo "setup what?"
+    echo "usage: setup <computer>"
+	exit 1
+fi
+
+case $1 in
+	ferrari)
+		echo "setting up for ferrari..."
+		export UCNb_DATA_DIR=/home/ucnb/data
+		export UCNb_RAW_DATA_DIR=/home/ucnb/data/raw
+		export UCNb_PROCESSED_DATA_DIR=/home/ucnb/data/processed
+		;;
+	pcucn)
+		echo "setting up for pcucn..."
+		export UCNb_DATA_DIR=/home/daq/ucnb/data
+		export UCNb_RAW_DATA_DIR=/home/daq/ucnb/data/raw
+		export UCNb_PROCESSED_DATA_DIR=/home/daq/ucnb/data/processed
+		;;
+	kevinh)
+		echo "setting up kevinh..."
+		export UCNb_DATA_DIR=/home/kevinh/Data/UCN/UCNb2010
+		export UCNb_RAW_DATA_DIR=$UCNb_DATA_DIR/raw
+		export UCNb_PROCESSED_DATA_DIR=$UCNb_DATA_DIR/processed
+		;;
+esac
+
+echo UCNb_DATA_DIR=$UCNb_DATA_DIR
+echo UCNb_RAW_DATA_DIR=$UCNb_RAW_DATA_DIR
+echo UCNb_PROCESSED_DATA_DIR=$UCNb_PROCESSED_DATA_DIR

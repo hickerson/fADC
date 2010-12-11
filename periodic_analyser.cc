@@ -42,8 +42,9 @@ class Spectrum
 
 Long64_t scan_time;
 Long64_t max_time;
-Long64_t start_time;
+TString filename;
 Long64_t background_start_time;
+Long64_t start_time;
 
 int time_bin_count;
 int area_bin_count;
@@ -61,6 +62,24 @@ float lifetime1_stop_time;
 float lifetime2_start_time;
 float lifetime2_stop_time;
 
+struct periodic_spectrum 
+{
+	TString filename;
+  	TFile* file;
+  	TTree* tree;
+	TString hist_name;
+	TH1F* time_hist; 
+	TH1F* area_hist;
+	TH2F* area_time_hist;
+	Long64_t start_time;
+	Long64_t scan_time;
+	Long64_t max_time;
+	double multiplier;
+
+public:
+	int make_historgram();
+};
+
 bool verbose;
 
 void usage(const char * arg_name) 
@@ -70,6 +89,77 @@ void usage(const char * arg_name)
 
 Long64_t trigger(TTree* tree) {
 	
+}
+
+int periodic_spectrum::make_historgram()
+{
+/*
+  	TFile* file = new TFile(filename);
+  	if (file->IsZombie())
+  	{
+		cout << "File "<<filename<<"not found."<<endl;
+		exit(1);
+  	}
+
+  	TTree* tree = (TTree*)file->Get("allEvents");
+  	if (!tree)
+  	{
+		cout<<"TTree not found in beta file "<<filename<<endl;
+        	exit(1);
+  	}
+
+	if ( verbose ) {
+		if ( tree->GetEntries() == (long)tree->GetEntries())
+  			printf("Number of entries in the tree %li.\n", (long) tree->GetEntries());
+		else
+  			printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
+	}
+
+	*area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
+				   time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
+	*time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", time_fine_ratio*time_bin_count, 0, scan_time/1E9);
+	*area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", area_fine_ratio*area_bin_count, 0, max_area);
+	
+	Long64_t num = 0;
+	NGammaEvent* event = new NGammaEvent();
+        tree->SetBranchAddress("evt", &event);
+	
+	int N = tree->GetEntries();
+	tree->GetEntry(0);
+	Long64_t first_time = event->peakTime;
+
+	for (int i = 0; i < N; i++)
+	{
+		if (tree->GetEntry(i) > 0)
+		{
+			Long64_t sample_time = event->peakTime - first_time;
+			if (event->channel == 23 && sample_time < max_time)
+			{
+				double cycle_time = ((sample_time + scan_time - start_time) % scan_time) / 1E9; // seconds
+				double area = event->area;  
+				double pulse_height = event->maxSample;  
+				double charge = area;
+
+				if (pulse_height < 4096) {
+					(*area_time_hist)->Fill(cycle_time, charge);
+
+					if (charge > lower_area_cut && charge < upper_area_cut)
+						(*time_hist)->Fill(cycle_time);
+
+					if (cycle_time > lower_time_cut && cycle_time < upper_area_cut)
+						(*area_hist)->Fill(charge);
+
+					num++;
+				}
+			}
+		}
+		else
+			cout << "error getting entry" << i << endl;
+	}
+
+	cout << "Number of entries filled is " << num << "." << endl;
+	return num;
+*/
 }
 
 int make_historgram(TString filename, TString hist_name, TH2F** area_time_hist, TH1F** time_hist, TH1F** area_hist)
@@ -216,9 +306,9 @@ int main (int arg_c, char **arg_v)
 	
   	// Construct run filename
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	TString beta_filename(root_data_dir + "run" + TString(arg_v[1]) + ".root");
+	TString beta_filename(root_data_dir + "/run" + TString(arg_v[1]) + ".root");
 	//TString beta_filename(root_data_dir + arg_v[1]);
-	TString back_filename(root_data_dir + "run" + TString(arg_v[2]) + ".root");
+	TString back_filename(root_data_dir + "/run" + TString(arg_v[2]) + ".root");
 	//TString back_filename(root_data_dir + arg_v[2]);
 
   	// Open beta ntuple
