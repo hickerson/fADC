@@ -56,10 +56,10 @@ public:
 	BoardData(int basenum, const float *cmul, unsigned int nchan = CHANNELS_PER_BOARD):
 	  baseNumber(basenum), nChannels(nchan), prevtimestamp(-666), timewrap(1<<28), nEventDraw(100), extractOption(1) { 
 		data.resize(nChannels);
-		printf("board basenum : %d \n", basenum);
+		//debug: printf("board basenum : %d \n", basenum);
 		for (unsigned int i=0; i<nChannels; i++) {
 			clockMul[i] = cmul[i];
-			printf("cmul[%d] = %f \n", i, clockMul[i]);
+			//debug: printf("cmul[%d] = %f \n", i, clockMul[i]);
 			timeoffset[i] = 0;
 			iEventDraw[i] = 0;
 		}
@@ -127,16 +127,16 @@ public:
 				
 				// timestamp wraparound fix
 				while(timestamp+timeoffset[c]-prevtimestamp < -timewrap/2 && j > 2)
-					{ printf("b %i c %i timestamp %lld timeoffset %lld prevtimestamp %lld\n", baseNumber, c, timestamp, timeoffset[c], prevtimestamp);
+					{ //debug: printf("b %i c %i timestamp %lld timeoffset %lld prevtimestamp %lld\n", baseNumber, c, timestamp, timeoffset[c], prevtimestamp);
 					  timeoffset[c] += timewrap;
-					  printf("timeoffset %lld\n", timeoffset[c]);
+					  //debug: printf("timeoffset %lld\n", timeoffset[c]);
 					}
 				while(timestamp+timeoffset[c]-prevtimestamp > timewrap/2 && j > 2)
-					{ printf("b %i c %i timestamp %lld timeoffset %lld\n", baseNumber, c, timestamp, timeoffset[c]);
+					{ //debug: printf("b %i c %i timestamp %lld timeoffset %lld\n", baseNumber, c, timestamp, timeoffset[c]);
 					  timeoffset[c] -= timewrap; 
-					  printf("timeoffset %lld\n", timeoffset[c]);
+					  //debug: printf("timeoffset %lld\n", timeoffset[c]);
 					}
-				//printf("timeoffset %lld\n", timeoffset[c]);
+				//debug printf("timeoffset %lld\n", timeoffset[c]);
 				timestamp += timeoffset[c];
 				
 				if(0) {
@@ -352,7 +352,7 @@ public:
                 if (iEventDraw[channel-baseNumber] < nEventDraw && dEdx_min < -4)
                 {
 			TString c_name("c_"); c_name += channel; c_name += "_"; c_name += iEventDraw[channel-baseNumber];
-			std::cout << c_name << std::endl;
+			//debug std::cout << c_name << std::endl;
 			TCanvas *c = new TCanvas(c_name, c_name, 1200, 800);
 			TH1F *h1 = new TH1F("h1", "h1", samples.size(), 0, samples.size());
 			TH2F *h2 = new TH2F("h2", "h2", 100, *minSample, *maxSample, 100, -50, 50);
@@ -492,7 +492,7 @@ public:
 
             if( (t0*clockMul[channel-baseNumber] > 2.79e9 && t0*clockMul[channel-baseNumber] < 3e9) ) 
             {
-                std::cout << "t0 " << t0*clockMul[channel-baseNumber] << " size " << samples.size() << std::endl;
+                //debug: std::cout << "t0 " << t0*clockMul[channel-baseNumber] << " size " << samples.size() << std::endl;
                 std::vector<double> slope_l;
                 std::vector<double> slope_r;
                 std::vector<double> slope_delta;
@@ -504,7 +504,7 @@ public:
                   slope_l.push_back( y2-y1 );
                   slope_r.push_back( y3-y2 );
                   slope_delta.push_back( (y3-y2)-(y2-y1) );
-                  printf("y %e slope_l %e r %e delta %e \n", y2, y2-y1, y3-y2, (y3-y2)-(y2-y1));
+                  //printf("y %e slope_l %e r %e delta %e \n", y2, y2-y1, y3-y2, (y3-y2)-(y2-y1));
                 }
                 }
                 //for(std::vector<double>::iterator it = slope_delta.begin(); it < slope_delta.end(); it++)
@@ -634,20 +634,21 @@ void process_file(char* input_filename, RollingWindow* W)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
-		printf("Usage: <raw data filename> \n");
+    if (argc < 3) {
+		printf("Usage: <raw data filename> <processed filename>\n");
 		exit(1);
     }
 
-    for (int i = 1; i < argc; i++)
-    {
+    //for (int i = 1; i < argc; i++)
+    //{
 	// open output file
 	//TString dir_save("Z:/UCNb/Processed/");
 	//TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
 	//TString dir_save(getenv("UCNb_PROCESSED_DATA_DIR"));
 
 	//TFile* output_file = new TFile(dir_save+"/"+TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
-	TFile* output_file = new TFile(TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
+	//TFile* output_file = new TFile(TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
+	TFile* output_file = new TFile(TString(argv[2]), "RECREATE");
 	std::cout << output_file->GetName() << std::endl;
 	
 	// rolling window for coincidences within 100 clock cycles (?? what are these units)
@@ -701,6 +702,6 @@ int main(int argc, char *argv[])
 	// close output file
         output_file->Write();
         output_file->Close();
-    }
+    //}
     return 0;
 }

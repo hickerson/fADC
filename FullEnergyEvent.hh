@@ -4,14 +4,16 @@
 #include "TROOT.h"
 
 #define MAX_CHANNELS_PER_EVENT 8;
+#define ENERGY_CALIBRATION_DEGREE 3;
 
 class FullEnergyEvent
 {
 public:
-	NGammaEvent events[MAX_CHANNELS_PER_EVENT];
-	double gmsCoefficients[MAX_CHANNELS_PER_EVENT];
-	double visibleEnergy;
-	double calibratedFullEnergy;
+	int events;											//< the number of channel events that make this event
+	NGammaEvent events[MAX_CHANNELS_PER_EVENT];         
+	//double gmsCoefficients[MAX_CHANNELS_PER_EVENT][ENERGY_CALIBRATION_DEGREE];
+	//double visibleEnergy;
+	double trueEnergy;
 	Long64_t firstEventNum;
 	Long64_t visibleTriggerTime;
 	Long64_t calibratedTriggerTime;

@@ -45,7 +45,7 @@ void display(char *filename, int channel_1 = -1)
   //TString dir_name("H:/June30/");
   // TString dir_name("//Pcprad121/PRADUsers/WangPRAD/Data/FADC/He4/Sept2010/");
 
-  TString dir_name("Z:/UCNb/");
+  TString dir_name("/home/ucnbdaq/Data/UCNb/raw/");
   TString dir_file_name = dir_name + filename;
   FILE *fp = fopen(dir_file_name.Data(), "rb");
   unsigned char raw[2048];
@@ -74,7 +74,7 @@ void display(char *filename, int channel_1 = -1)
   vector<int> con_data;
   int count = 0;
 
-  TString dir_save("Z:/UCNb/Processed/");
+  TString dir_save("/home/ucnbdaq/Data/UCNb/processed/");
   //TString dir_save("H:/He4/");
   //TString dir_save("//Pcprad121/pradusers/WangPRAD/Data/FADC/He4/Sept2010/");
   TFile *f_out = new TFile( dir_save+TString(filename).ReplaceAll(".fat","")+".root", "RECREATE");
