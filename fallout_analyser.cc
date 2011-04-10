@@ -151,7 +151,7 @@ int main (int arg_c, char **arg_v)
 	beta_hist->SetLineColor(2);
 	back_hist->SetLineColor(4);
 	diff_hist->SetLineColor(1);
-	TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
+	TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2,1080/2);
 	beta_tree->Draw(beta_draw_cmd, *beta_cut);
 	beta_tree->Draw(diff_draw_cmd, *beta_cut);
 	back_tree->Draw(back_draw_cmd, *beta_cut);

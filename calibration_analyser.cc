@@ -24,7 +24,6 @@
 
 // UCNb INCLUDES
 #include "NGammaEvent.h"
-//#include "PeriodicSpectrum.hh"
 
 #define NUM_PMTS 1
 
@@ -37,7 +36,7 @@ class Spectrum
 	
 };
 
-// g++ `root-config --cflags` `root-config --libs` spectrum_analyser.cc -o spectrum_analyser
+// g++ `root-config --cflags` `root-config --libs` calibration_analyser.cc -o calibration_analyser
 
 /**
  * Authors: Kevin Peter Hickerson
@@ -51,7 +50,6 @@ struct PeriodicPattern
 	Long64_t scan_time;
 	Long64_t max_time;
 };
-
 
 struct PeriodicSpectrum 
 {
@@ -74,6 +72,7 @@ public:
 	int LoadFile();
 	PeriodicPattern GetTriggerPattern();
 };
+
 bool verbose;
 
 TString filename;
@@ -232,69 +231,6 @@ int main (int arg_c, char **arg_v)
 	lifetime1_stop_time = 300;
 	//lifetime2_start_time = 100;
 	//lifetime2_stop_time = 200;
-
-  	if (arg_c < 3)
-  	{
-		usage(arg_v[0]);
-		exit(1);
-  	}
-
-  	int foreground_run = atoi(arg_v[1]);
-  	if (foreground_run == 0)
-  	{
-		printf("Need a valid beta run number.\n");
-		usage(arg_v[0]);
-		exit(1);
-  	}
-
-	int background_run = atoi(arg_v[2]);
-  	if (background_run == 0)
-  	{
-		printf("no background run number found.\n");
-		//printf("Need a valid background run number.\n");
-		//usage(arg_v[0]);
-		//exit(1);
-  	}
-	if (background_run == foreground_run)
-	{
-		printf("Using same run as background");
-		background_run = 0;
-	}
-	
-  	if (arg_c > 3) 
-  	{
-		foreground_pattern.start_time = Long64_t(atof(arg_v[3]) * 1E9);
-	}
-	background_pattern.start_time = foreground_pattern.start_time;
-
-  	if (arg_c > 4) 
-  	{
-		foreground_pattern.scan_time = Long64_t(atof(arg_v[4]) * 1E9);
-		time_bin_count = int(atof(arg_v[4])*10);
-		printf("time bin count %d\n", time_bin_count);
-	}
-	background_pattern.scan_time = foreground_pattern.scan_time;
-	
-  	if (arg_c > 5) 
-  	{
-		foreground_pattern.max_time = Long64_t(atof(arg_v[5]) * 1E9);
-		time_fine_ratio = atof(arg_v[5]) / time_bin_count;
-		printf("time bin count multiplier %f\n", time_fine_ratio);
-	}
-	background_pattern.max_time = foreground_pattern.max_time;
-
-	if (background_run)
-	{
-  		if (arg_c > 6) 
-  		{
-			background_pattern.start_time = Long64_t(atof(arg_v[6]) * 1E9);
-		}
-	}
-
-	for (int i = 3; i < arg_c; i++)
-	{
-		// ...
-	}
 
   	// Construct run filename
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
