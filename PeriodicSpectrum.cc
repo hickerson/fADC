@@ -6,12 +6,14 @@
  */
 #include "PeriodicSpectrum.hh"
 
-PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, double _multiplier)
+PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, 
+						PeriodicPattern _pattern, PeriodicCuts _cuts, double _multiplier)
 {
 	filename = _filename;
 	hist_name = _hist_name;
 
 	pattern = _pattern;
+	cuts = _cuts;
 	//start_time = _start_time;
 	//stop_time = _stop_time;
 	//scan_time = _scan_time;
@@ -58,9 +60,9 @@ int PeriodicSpectrum::LoadFile()
 int PeriodicSpectrum::MakeHistogram()
 {
 	area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
-				   time_bin_count, 0, pattern.scan_time/1E9, area_bin_count, 0, max_area);
-	time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", int(time_fine_ratio*time_bin_count), 0, pattern.scan_time/1E9);
-	area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", int(area_fine_ratio*area_bin_count), 0, max_area);
+				   cuts.time_bin_count, 0, pattern.scan_time/1E9, cuts.area_bin_count, 0, cuts.max_area);
+	time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", int(cuts.time_fine_ratio*cuts.time_bin_count), 0, pattern.scan_time/1E9);
+	area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", int(cuts.area_fine_ratio*cuts.area_bin_count), 0, cuts.max_area);
 	
 	Long64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
@@ -87,10 +89,10 @@ int PeriodicSpectrum::MakeHistogram()
 				if (pulse_height < 4096) {
 					area_time_hist->Fill(cycle_time, charge);
 
-					if (charge > lower_area_cut && charge < upper_area_cut)
+					if (charge > cuts.lower_area_cut && charge < cuts.upper_area_cut)
 						time_hist->Fill(double(cycle_time/1E9));
 
-					if (cycle_time > lower_time_cut && cycle_time < upper_time_cut)
+					if (cycle_time > cuts.lower_time_cut && cycle_time < cuts.upper_time_cut)
 						area_hist->Fill(charge);
 
 					num++;

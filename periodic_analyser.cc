@@ -24,7 +24,7 @@
 
 // UCNb INCLUDES
 #include "NGammaEvent.h"
-//#include "PeriodicSpectrum.hh"
+#include "PeriodicSpectrum.hh"
 
 #define NUM_PMTS 1
 
@@ -43,7 +43,6 @@ class Spectrum
  * Authors: Kevin Peter Hickerson
  * Date: Oct 2010
  *
- */
 struct PeriodicPattern
 {
 	Long64_t start_time;
@@ -51,8 +50,10 @@ struct PeriodicPattern
 	Long64_t scan_time;
 	Long64_t max_time;
 };
+ */
 
 
+/*
 struct PeriodicSpectrum 
 {
 	TString filename;
@@ -74,17 +75,15 @@ public:
 	int LoadFile();
 	PeriodicPattern GetTriggerPattern();
 };
-bool verbose;
+*/
+#define verbose true;
 
-TString filename;
-
-PeriodicPattern foreground_pattern;
-PeriodicPattern background_pattern;
 //Long64_t scan_time;
 //Long64_t max_time;
 //Long64_t start_time;
 //Long64_t background_start_time;
 
+/*
 int time_bin_count;
 int area_bin_count;
 float time_fine_ratio;
@@ -95,6 +94,7 @@ double lower_area_cut;
 double upper_area_cut;
 Long64_t lower_time_cut;
 Long64_t upper_time_cut;
+*/
 
 float lifetime1_start_time;
 float lifetime1_stop_time;
@@ -107,6 +107,7 @@ void usage(const char * arg_name)
 }
 
 
+/*
 //PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t stop_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier)
 PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, double _multiplier)
 {
@@ -206,27 +207,33 @@ int PeriodicSpectrum::MakeHistogram()
 	cout << "Number of entries filled is " << num << "." << endl;
 	return num;
 }
+*/
 
 int main (int arg_c, char **arg_v)
 {
  	TApplication app("PMT Spectrum Analysis", &arg_c, arg_v);
 	vector<PeriodicSpectrum*> spectra;
 
+	TString filename;
+	PeriodicPattern foreground_pattern;
+	PeriodicPattern background_pattern;
+	PeriodicCuts cuts;
+
 	foreground_pattern.start_time = Long64_t(0);       // ns
 	foreground_pattern.scan_time = Long64_t(5.2E9); 	// ns
 	foreground_pattern.max_time = Long64_t(520E9); 	// ns
 
-	time_bin_count = 52;
-	area_bin_count = 100;		
-	time_fine_ratio = 1;
-	area_fine_ratio = 4;
+	cuts.time_bin_count = 52;
+	cuts.area_bin_count = 100;		
+	cuts.time_fine_ratio = 1;
+	cuts.area_fine_ratio = 4;
 
 	//max_area = 4096;
-	max_area = 4096*16;              // in multiples 78 fC
-	lower_area_cut = 0;
-	upper_area_cut = max_area;
-	lower_time_cut = foreground_pattern.scan_time * 0.1;
-	upper_time_cut = foreground_pattern.scan_time * 0.9;
+	cuts.max_area = 4096*16;              // in multiples 78 fC
+	cuts.lower_area_cut = 0;
+	cuts.upper_area_cut = cuts.max_area;
+	cuts.lower_time_cut = foreground_pattern.scan_time * 0.1;
+	cuts.upper_time_cut = foreground_pattern.scan_time * 0.9;
 
 	lifetime1_start_time = 156;
 	lifetime1_stop_time = 300;
@@ -270,16 +277,16 @@ int main (int arg_c, char **arg_v)
   	if (arg_c > 4) 
   	{
 		foreground_pattern.scan_time = Long64_t(atof(arg_v[4]) * 1E9);
-		time_bin_count = int(atof(arg_v[4])*10);
-		printf("time bin count %d\n", time_bin_count);
+		cuts.time_bin_count = int(atof(arg_v[4])*10);
+		printf("time bin count %d\n", cuts.time_bin_count);
 	}
 	background_pattern.scan_time = foreground_pattern.scan_time;
 	
   	if (arg_c > 5) 
   	{
 		foreground_pattern.max_time = Long64_t(atof(arg_v[5]) * 1E9);
-		time_fine_ratio = atof(arg_v[5]) / time_bin_count;
-		printf("time bin count multiplier %f\n", time_fine_ratio);
+		cuts.time_fine_ratio = atof(arg_v[5]) / cuts.time_bin_count;
+		printf("time bin count multiplier %f\n", cuts.time_fine_ratio);
 	}
 	background_pattern.max_time = foreground_pattern.max_time;
 
@@ -306,7 +313,7 @@ int main (int arg_c, char **arg_v)
 	PeriodicSpectrum* background = 0;
 
 	//foreground = new PeriodicSpectrum(fore_filename, "foreground", start_time, scan_time, max_time, +1);
-	foreground = new PeriodicSpectrum(foreground_filename, "foreground", foreground_pattern, +1);
+	foreground = new PeriodicSpectrum(foreground_filename, "foreground", foreground_pattern, cuts, +1);
 	if (foreground)
 	{
 		foreground->LoadFile();
@@ -317,7 +324,7 @@ int main (int arg_c, char **arg_v)
 	if (background_run)
 	{
 		//background = new PeriodicSpectrum(back_filename, "background", background_start_time, scan_time, max_time, -1/10);
-		background = new PeriodicSpectrum(background_filename, "background", background_pattern, -1);
+		background = new PeriodicSpectrum(background_filename, "background", background_pattern, cuts, -1);
 		if (background)
 		{
 			background->LoadFile();
@@ -434,7 +441,7 @@ int main (int arg_c, char **arg_v)
 	}
 
 	int cycles = foreground_pattern.max_time / foreground_pattern.scan_time;
-	Long64_t time_window = upper_time_cut - lower_time_cut;
+	Long64_t time_window = cuts.upper_time_cut - cuts.lower_time_cut;
 	Long64_t live_time = time_window * cycles;
 	double back_counts = diff_area_hist->Integral();
 	double fore_counts = diff_area_hist->Integral();
