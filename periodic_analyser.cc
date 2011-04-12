@@ -43,58 +43,7 @@ class Spectrum
  * Authors: Kevin Peter Hickerson
  * Date: Oct 2010
  *
-struct PeriodicPattern
-{
-	Long64_t start_time;
-	Long64_t stop_time;
-	Long64_t scan_time;
-	Long64_t max_time;
-};
  */
-
-
-/*
-struct PeriodicSpectrum 
-{
-	TString filename;
-	TString hist_name;
-	PeriodicPattern pattern;
-	double multiplier;
-
-  	TFile* file;
-  	TTree* tree;
-	TH1F* trigger_hist; 
-	TH1F* time_hist; 
-	TH1F* area_hist;
-	TH2F* area_time_hist;
-
-public:
-	//PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier);
-	PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, double _multiplier);
-	int MakeHistogram();
-	int LoadFile();
-	PeriodicPattern GetTriggerPattern();
-};
-*/
-#define verbose true;
-
-//Long64_t scan_time;
-//Long64_t max_time;
-//Long64_t start_time;
-//Long64_t background_start_time;
-
-/*
-int time_bin_count;
-int area_bin_count;
-float time_fine_ratio;
-float area_fine_ratio;
-
-double max_area;
-double lower_area_cut;
-double upper_area_cut;
-Long64_t lower_time_cut;
-Long64_t upper_time_cut;
-*/
 
 float lifetime1_start_time;
 float lifetime1_stop_time;
@@ -106,108 +55,6 @@ void usage(const char * arg_name)
 	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)] [background start time(s)]\n", arg_name);
 }
 
-
-/*
-//PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t stop_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier)
-PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, double _multiplier)
-{
-	filename = _filename;
-	hist_name = _hist_name;
-
-	pattern = _pattern;
-	//start_time = _start_time;
-	//stop_time = _stop_time;
-	//scan_time = _scan_time;
-	//max_time = _max_time;
-	multiplier = _multiplier;
-
-  	file = 0;
-  	tree = 0;
-	time_hist = 0; 
-	area_hist = 0;
-	area_time_hist = 0;
-}
-
-PeriodicPattern PeriodicSpectrum::GetTriggerPattern()
-{
-	
-}
-
-
-int PeriodicSpectrum::LoadFile()
-{
-  	file = new TFile(filename);
-  	if (file->IsZombie())
-  	{
-		cout << "File "<<filename<<" not found."<<endl;
-		exit(1);
-  	}
-
-  	tree = (TTree*)file->Get("allEvents");
-  	if (!tree)
-  	{
-		cout<<"TTree not found in beta file "<<filename<<endl;
-        	exit(1);
-  	}
-
-	if ( verbose ) {
-		if ( tree->GetEntries() == (long)tree->GetEntries())
-  			printf("Number of entries in the tree %li.\n", (long) tree->GetEntries());
-		else
-  			printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
-	}
-}
-
-int PeriodicSpectrum::MakeHistogram()
-{
-	area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
-				   time_bin_count, 0, pattern.scan_time/1E9, area_bin_count, 0, max_area);
-	time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", int(time_fine_ratio*time_bin_count), 0, pattern.scan_time/1E9);
-	area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", int(area_fine_ratio*area_bin_count), 0, max_area);
-	
-	Long64_t num = 0;
-	NGammaEvent* event = new NGammaEvent();
-        tree->SetBranchAddress("evt", &event);
-	
-	int N = tree->GetEntries();
-	tree->GetEntry(0);
-	Long64_t first_time = event->peakTime;
-
-	for (int i = 0; i < N; i++)
-	{
-		if (tree->GetEntry(i) > 0)
-		{
-			Long64_t sample_time = event->peakTime - first_time;
-			if (event->channel == 21 && sample_time < pattern.max_time)
-			{
-				//double cycle_time = ((sample_time + scan_time - start_time) % scan_time) / 1E9; // seconds
-				//double cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time) / 1E9; // seconds
-				Long64_t cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time); // seconds
-				double area = event->area;  
-				double pulse_height = event->maxSample;  
-				double charge = area;
-
-				if (pulse_height < 4096) {
-					area_time_hist->Fill(cycle_time, charge);
-
-					if (charge > lower_area_cut && charge < upper_area_cut)
-						time_hist->Fill(double(cycle_time/1E9));
-
-					if (cycle_time > lower_time_cut && cycle_time < upper_time_cut)
-						area_hist->Fill(charge);
-
-					num++;
-				}
-			}
-		}
-		else
-			cout << "error getting entry" << i << endl;
-	}
-
-	cout << "Number of entries filled is " << num << "." << endl;
-	return num;
-}
-*/
 
 int main (int arg_c, char **arg_v)
 {
@@ -333,15 +180,6 @@ int main (int arg_c, char **arg_v)
 		}
 	}
 
-/*
-  	// Open beta ntuple
-	TH2F* fore_area_time_hist;
-	TH1F* fore_time_hist;
-	TH1F* fore_area_hist;
-	TH2F* back_area_time_hist;
-	TH1F* back_time_hist;
-	TH1F* back_area_hist;
-*/	
 	TH2F* diff_area_time_hist;
 	TH1F* diff_time_hist;
 	TH1F* diff_area_hist;

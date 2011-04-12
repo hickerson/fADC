@@ -86,8 +86,10 @@ struct PeriodicSpectrum
 public:
 	//PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier);
 	PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, PeriodicCuts _cuts, double _multiplier);
+	PeriodicSpectrum(TString _filename, TString _hist_name, const PeriodicSpectrum& _copy);
 	int MakeHistogram();
 	int LoadFile();
+	void add(const PeriodicSpectrum &spectrum);
 	PeriodicPattern GetTriggerPattern();
 };
 

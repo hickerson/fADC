@@ -27,11 +27,42 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name,
 	area_time_hist = 0;
 }
 
+PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, const PeriodicSpectrum& copy)
+{
+	filename = _filename;
+	hist_name = _hist_name;
+
+	pattern = copy.pattern;
+	cuts = copy.cuts;
+	multiplier = copy.multiplier;
+
+  	file = 0;
+  	tree = 0;
+	add(copy);
+}
+
 PeriodicPattern PeriodicSpectrum::GetTriggerPattern()
 {
 	
 }
 
+void PeriodicSpectrum::add(const PeriodicSpectrum &spectrum)
+{
+	if (area_hist)
+		area_hist->Add(spectrum.area_hist, spectrum.multiplier);
+	else
+		area_hist = new TH1F(*(spectrum.area_hist));
+
+	if (time_hist)
+		time_hist->Add(spectrum.time_hist, spectrum.multiplier);
+	else
+		time_hist = new TH1F(*(spectrum.time_hist));
+
+	if (area_time_hist)
+		area_time_hist->Add(spectrum.area_time_hist, spectrum.multiplier);
+	else
+		area_time_hist = new TH2F(*(spectrum.area_time_hist));
+}
 
 int PeriodicSpectrum::LoadFile()
 {
@@ -71,21 +102,20 @@ int PeriodicSpectrum::MakeHistogram()
 	int N = tree->GetEntries();
 	tree->GetEntry(0);
 	Long64_t first_time = event->peakTime;
+	Long64_t last_time = first_time;
 
 	for (int i = 0; i < N; i++)
 	{
 		if (tree->GetEntry(i) > 0)
 		{
 			Long64_t sample_time = event->peakTime - first_time;
+			Long64_t cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time); // seconds
+			double area = event->area;  
+			double pulse_height = event->maxSample;  
+			double charge = area;
+
 			if (event->channel == 21 && sample_time < pattern.max_time)
 			{
-				//double cycle_time = ((sample_time + scan_time - start_time) % scan_time) / 1E9; // seconds
-				//double cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time) / 1E9; // seconds
-				Long64_t cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time); // seconds
-				double area = event->area;  
-				double pulse_height = event->maxSample;  
-				double charge = area;
-
 				if (pulse_height < 4096) {
 					area_time_hist->Fill(cycle_time, charge);
 
