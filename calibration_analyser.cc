@@ -74,40 +74,17 @@ void addSpectrum(TString filename, TString name, PeriodicPattern pattern, Period
 int main (int arg_c, char **arg_v)
 {
  	TApplication app("PMT Spectrum Analysis", &arg_c, arg_v);
-	vector<PeriodicSpectrum*> spectra;
-
-	TString filename;
-	int calN = 4;
-	PeriodicPattern background_pattern;
-	//PeriodicPattern calibration_pattern[calN];
-	PeriodicPattern foreground_pattern;
+	int N = 4;
+	//TString name[N] = {"Ce139", "Cd139", "Sn113", "Bi207", "background"};
+	TString name[] = {"Bi207", "Bi207", "Bi207", "background"};
+	TString run[] = {"3851", "3854", "3855", "3800"};
+	//int  run[] = {3814, 3800};
+	double mult[] = {+1, +1, +1, -3};
+	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
+	PeriodicPattern pattern;
 	PeriodicCuts cuts;
-	TString calibration_names[4] = {"Ce-139", "Cd-139", "Sn-113", "Bi-207"};
 
-	foreground_pattern.start_time = Long64_t(0);       // ns
-	foreground_pattern.scan_time = Long64_t(5.2E9); 	// ns
-	foreground_pattern.max_time = Long64_t(520E9); 	// ns
 /*
-	for (int i = 0; i < calN; i++)
-	{
-		calibration_pattern.start_time = Long64_t(0);       // ns
-		calibration_pattern.scan_time = Long64_t(5.2E9); 	// ns
-		calibration_pattern.max_time = Long64_t(520E9); 	// ns
-	}
-*/
-
-	cuts.time_bin_count = 52;
-	cuts.area_bin_count = 100;		
-	cuts.time_fine_ratio = 1;
-	cuts.area_fine_ratio = 4;
-
-	//max_area = 4096;
-	cuts.max_area = 4096*16;              // in multiples 78 fC
-	cuts.lower_area_cut = 0;
-	cuts.upper_area_cut = cuts.max_area;
-	cuts.lower_time_cut = foreground_pattern.scan_time * 0.1;
-	cuts.upper_time_cut = foreground_pattern.scan_time * 0.9;
-
   	if (arg_c < 3)
   	{
 		usage(arg_v[0]);
@@ -123,13 +100,6 @@ int main (int arg_c, char **arg_v)
 		exit(1);
   	}
 
-	TString back_run_str(arg_v[2]);
-	int background_run = atoi(back_run_str);
-  	if (background_run == 0)
-	{
-		printf("no background run number found.\n");
-	}
-
 	if (background_run == foreground_run)
 	{
 		printf("Using same run as background");
@@ -137,52 +107,65 @@ int main (int arg_c, char **arg_v)
 	}
   	if (arg_c > 3) 
   	{
-		foreground_pattern.start_time = Long64_t(atof(arg_v[3]) * 1E9);
+		pattern.start_time = Long64_t(atof(arg_v[3]) * 1E9);
 	}
-	background_pattern.start_time = foreground_pattern.start_time;
 
   	if (arg_c > 4) 
   	{
-		foreground_pattern.scan_time = Long64_t(atof(arg_v[4]) * 1E9);
-		cuts.time_bin_count = int(atof(arg_v[4])*10);
+		double d = atof(arg_v[4]);
+		pattern.scan_time = Long64_t(d * 1E9);
+		cuts.time_bin_count = int(d)*10);
 		printf("time bin count %d\n", cuts.time_bin_count);
 	}
-	background_pattern.scan_time = foreground_pattern.scan_time;
 	
   	if (arg_c > 5) 
   	{
-		foreground_pattern.max_time = Long64_t(atof(arg_v[5]) * 1E9);
-		cuts.time_fine_ratio = atof(arg_v[5]) / cuts.time_bin_count;
+		double d = atof(arg_v[5]);
+		pattern.max_time = Long64_t(d * 1E9);
+		cuts.time_fine_ratio = d / cuts.time_bin_count;
 		printf("time bin count multiplier %f\n", cuts.time_fine_ratio);
 	}
-	background_pattern.max_time = foreground_pattern.max_time;
 
 	if (background_run)
 	{
   		if (arg_c > 6) 
   		{
-			background_pattern.start_time = Long64_t(atof(arg_v[6]) * 1E9);
+			pattern.start_time = Long64_t(atof(arg_v[6]) * 1E9);
 		}
 	}
+*/
 
-  	// construct run filename
-	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	TString foreground_filename(root_data_dir + "/run" + fore_run_str + ".root");
-	TString background_filename(root_data_dir + "/run" + back_run_str + ".root");
+	pattern.start_time = Long64_t(0);       // ns
+	pattern.scan_time = Long64_t(5.2E9); 	// ns
+	pattern.max_time = Long64_t(520E9); 	// ns
+
+	cuts.time_bin_count = 52;
+	cuts.area_bin_count = 100;		
+	cuts.time_fine_ratio = 1;
+	cuts.area_fine_ratio = 4;
+
+	//max_area = 4096;
+	cuts.max_area = 4096*16;              // in multiples 78 fC
+	cuts.lower_area_cut = 0;
+	cuts.upper_area_cut = cuts.max_area;
+	cuts.lower_time_cut = pattern.scan_time * 0.1;
+	cuts.upper_time_cut = pattern.scan_time * 0.9;
+
 
 	PeriodicSpectrum* sum = 0;
-
-	addSpectrum(foreground_filename, "foreground", foreground_pattern, cuts, &sum, +1);
-
-	if (not sum)
+	for (int i = 0; i < N; i++)
 	{
-		cout << "no sum made" << endl;
-		exit(1);
+  		// construct run filename
+		TString filename(root_data_dir + "/run" + run[i] + ".root");
+
+		// add in the new data
+		addSpectrum(filename, name[i], pattern, cuts, &sum, mult[i]);
+		if (not sum)
+		{
+			cout << "no sum made" << endl;
+			exit(1);
+		}
 	}
-
-	if (background_run)
-		addSpectrum(background_filename, "background", background_pattern, cuts, &sum, -1);
-
 
   	// Plot options
   	gStyle->SetOptStat(1);
@@ -226,7 +209,7 @@ int main (int arg_c, char **arg_v)
 	}
 */
 
-	int cycles = foreground_pattern.max_time / foreground_pattern.scan_time;
+	int cycles = pattern.max_time / pattern.scan_time;
 	Long64_t time_window = cuts.upper_time_cut - cuts.lower_time_cut;
 	Long64_t live_time = time_window * cycles;
 /*
