@@ -50,26 +50,25 @@ void usage(const char * arg_name)
 	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)] [background start time(s)]\n", arg_name);
 }
 
-void addSpectrum(TString filename, TString name, PeriodicPattern pattern, PeriodicCuts cuts, PeriodicSpectrum *sum, double mult)
+void addSpectrum(TString filename, TString name, PeriodicPattern pattern, PeriodicCuts cuts, PeriodicSpectrum **sum, double mult)
 {
 	// construct spectrum
-	PeriodicSpectrum* spectrum = new PeriodicSpectrum(filename, name, pattern, cuts, mult);
-	if (spectrum)
-	{
-		spectrum->LoadFile();
-		spectrum->GetTriggerPattern();
-		spectrum->MakeHistogram();
-	}
-	else
-	{
-		cerr << "Error making spectrum" << endl;
-		exit(1);
-	}
+	PeriodicSpectrum spectrum(filename, name, pattern, cuts, mult);
+	spectrum.LoadFile();
+	spectrum.GetTriggerPattern();
+	spectrum.MakeHistogram();
 
-	if (sum)
-		sum->add(*spectrum);
+	if (*sum)
+		(*sum)->add(spectrum);
 	else
-		sum = new PeriodicSpectrum("sum", "sum_hist", *spectrum);
+	{
+		*sum = new PeriodicSpectrum("sum", "sum_hist", spectrum);
+		if (not *sum)
+		{
+			cout << "Error making sum spectrum." << endl;
+			exit(1);
+		}
+	}
 		
 
 /*
@@ -128,7 +127,8 @@ int main (int arg_c, char **arg_v)
 		exit(1);
   	}
 
-  	int foreground_run = atoi(arg_v[1]);
+	TString fore_run_str(arg_v[1]);
+  	int foreground_run = atoi(fore_run_str);
   	if (foreground_run == 0)
   	{
 		printf("Need a valid beta run number.\n");
@@ -136,7 +136,8 @@ int main (int arg_c, char **arg_v)
 		exit(1);
   	}
 
-	int background_run = atoi(arg_v[2]);
+	TString back_run_str(arg_v[2]);
+	int background_run = atoi(back_run_str);
   	if (background_run == 0)
   	{
 		printf("no background run number found.\n");
@@ -181,17 +182,21 @@ int main (int arg_c, char **arg_v)
 
   	// construct run filename
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	TString foreground_filename(root_data_dir + "/run" + TString(foreground_run) + ".root");
-	TString background_filename(root_data_dir + "/run" + TString(background_run) + ".root");
+	TString foreground_filename(root_data_dir + "/run" + fore_run_str + ".root");
+	TString background_filename(root_data_dir + "/run" + back_run_str + ".root");
 
 	PeriodicSpectrum* sum = 0;
 
-	addSpectrum(foreground_filename, "foreground", foreground_pattern, cuts, sum, +1);
+	addSpectrum(foreground_filename, "foreground", foreground_pattern, cuts, &sum, +1);
+
+	if (not sum)
+	{
+		cout << "no sum made" << endl;
+		exit(1);
+	}
 
 	if (background_run)
-	{
-		addSpectrum(background_filename, "background", background_pattern, cuts, sum, -1);
-	}
+		addSpectrum(background_filename, "background", background_pattern, cuts, &sum, -1);
 
 /*
 	TH2F* diff_area_time_hist;

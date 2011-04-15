@@ -14,10 +14,6 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name,
 
 	pattern = _pattern;
 	cuts = _cuts;
-	//start_time = _start_time;
-	//stop_time = _stop_time;
-	//scan_time = _scan_time;
-	//max_time = _max_time;
 	multiplier = _multiplier;
 
   	file = 0;
@@ -38,6 +34,10 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, const 
 
   	file = 0;
   	tree = 0;
+	time_hist = 0; 
+	area_hist = 0;
+	area_time_hist = 0;
+
 	add(copy);
 }
 
@@ -80,12 +80,14 @@ int PeriodicSpectrum::LoadFile()
         	exit(1);
   	}
 
+/*
 	if ( verbose ) {
 		if ( tree->GetEntries() == (long)tree->GetEntries())
   			printf("Number of entries in the tree %li.\n", (long) tree->GetEntries());
 		else
   			printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
 	}
+*/
 }
 
 int PeriodicSpectrum::MakeHistogram()
