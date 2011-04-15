@@ -69,19 +69,6 @@ void addSpectrum(TString filename, TString name, PeriodicPattern pattern, Period
 			exit(1);
 		}
 	}
-		
-
-/*
-	if (diff_area_time_hist)
-		diff_area_time_hist->Add(spectrum->area_time_hist, background->multiplier);
-	else
-		diff_area_time_hist = new TH2F(*(spectrum->area_time_hist));
-
-	if (diff_time_hist)
-		diff_time_hist->Add(spectrum->time_hist, background->multiplier);
-	else
-		diff_time_hist = new TH1F(*(spectrum->time_hist));
-*/
 }
 
 int main (int arg_c, char **arg_v)
@@ -139,12 +126,10 @@ int main (int arg_c, char **arg_v)
 	TString back_run_str(arg_v[2]);
 	int background_run = atoi(back_run_str);
   	if (background_run == 0)
-  	{
+	{
 		printf("no background run number found.\n");
-		//printf("Need a valid background run number.\n");
-		//usage(arg_v[0]);
-		//exit(1);
-  	}
+	}
+
 	if (background_run == foreground_run)
 	{
 		printf("Using same run as background");
@@ -198,24 +183,6 @@ int main (int arg_c, char **arg_v)
 	if (background_run)
 		addSpectrum(background_filename, "background", background_pattern, cuts, &sum, -1);
 
-/*
-	TH2F* diff_area_time_hist;
-	TH1F* diff_time_hist;
-	TH1F* diff_area_hist;
-
-	diff_area_time_hist = new TH2F(*(foreground->area_time_hist));
-	diff_time_hist = new TH1F(*(foreground->time_hist));
-	diff_area_hist = new TH1F(*(foreground->area_hist));
-
-
-	// Do background subtraction
-	if (background)
-	{
-		diff_area_time_hist->Add(background->area_time_hist, background->multiplier);
-		diff_time_hist->Add(background->time_hist, background->multiplier);
-		diff_area_hist->Add(background->area_hist, background->multiplier);
-	}
-*/
 
   	// Plot options
   	gStyle->SetOptStat(1);
