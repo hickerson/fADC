@@ -21,6 +21,10 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name,
 	time_hist = 0; 
 	area_hist = 0;
 	area_time_hist = 0;
+
+    time.live = 0;
+    time.real = 0;
+    time.dead = 0;
 }
 
 PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, const PeriodicSpectrum& copy)
@@ -38,33 +42,78 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, const 
 	area_hist = 0;
 	area_time_hist = 0;
 
+    time.live = copy.time.live;
+    time.real = copy.time.real;
+    time.dead = copy.time.dead;
+
 	add(copy);
 }
 
-PeriodicPattern PeriodicSpectrum::GetTriggerPattern()
+PeriodicPattern PeriodicSpectrum::getTriggerPattern()
 {
 	
 }
 
+int PeriodicSpectrum::scaleToRealTime()
+{
+    if (time.real == 0)
+    {   
+        cout << "Real time is zero! Can't scale!" << endl;
+        return 1;
+    }
+    double s = 1E9/time.real;
+    cout << "Scaling to real time " << 1/s << " s" << endl;
+    return scale(s);
+}
+
+int PeriodicSpectrum::scale(double s)
+{
+    if (s == 0)
+    {   
+        cout << "Scalar is zero! Can't scale!" << endl;
+        return 1;
+    }
+
+	if (area_hist)
+		area_hist->Scale(s);
+
+	if (time_hist)
+		time_hist->Scale(s);
+
+	if (area_time_hist)
+		area_time_hist->Scale(s);
+
+    return 0;
+}
+
 void PeriodicSpectrum::add(const PeriodicSpectrum &spectrum)
 {
+    add(spectrum, spectrum.multiplier);
+}
+
+void PeriodicSpectrum::add(const PeriodicSpectrum &spectrum, double s)
+{
 	if (area_hist)
-		area_hist->Add(spectrum.area_hist, spectrum.multiplier);
+		area_hist->Add(spectrum.area_hist, s);
 	else
 		area_hist = new TH1F(*(spectrum.area_hist));
 
 	if (time_hist)
-		time_hist->Add(spectrum.time_hist, spectrum.multiplier);
+		time_hist->Add(spectrum.time_hist, s);
 	else
 		time_hist = new TH1F(*(spectrum.time_hist));
 
 	if (area_time_hist)
-		area_time_hist->Add(spectrum.area_time_hist, spectrum.multiplier);
+		area_time_hist->Add(spectrum.area_time_hist, s);
 	else
 		area_time_hist = new TH2F(*(spectrum.area_time_hist));
+
+    time.real += spectrum.time.real;
+    time.live += spectrum.time.live;
+    time.dead += spectrum.time.dead;
 }
 
-int PeriodicSpectrum::LoadFile()
+int PeriodicSpectrum::loadFile()
 {
   	file = new TFile(filename);
   	if (file->IsZombie())
@@ -90,7 +139,7 @@ int PeriodicSpectrum::LoadFile()
 */
 }
 
-int PeriodicSpectrum::MakeHistogram()
+int PeriodicSpectrum::makeHistogram()
 {
 	area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
 				   cuts.time_bin_count, 0, pattern.scan_time/1E9, cuts.area_bin_count, 0, cuts.max_area);
@@ -110,7 +159,8 @@ int PeriodicSpectrum::MakeHistogram()
 	{
 		if (tree->GetEntry(i) > 0)
 		{
-			Long64_t sample_time = event->peakTime - first_time;
+			Long64_t this_time = event->peakTime;
+			Long64_t sample_time = this_time - first_time;
 			Long64_t cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time); // seconds
 			double area = event->area;  
 			double pulse_height = event->maxSample;  
@@ -130,10 +180,16 @@ int PeriodicSpectrum::MakeHistogram()
 					num++;
 				}
 			}
+
+            last_time = this_time;
 		}
 		else
 			cout << "error getting entry" << i << endl;
 	}
+
+    time.real += last_time - first_time;
+    time.dead += 0; // TODO ...
+    time.live += time.live - time.real;
 
 	cout << "Number of entries filled is " << num << "." << endl;
 	return num;

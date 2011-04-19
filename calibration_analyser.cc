@@ -16,6 +16,7 @@
 // STL includes
 #include <vector>
 #include <string>
+#include <map>
 
 // C INCLUDES
 #include <math.h>
@@ -50,37 +51,40 @@ void usage(const char * arg_name)
 	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)] [background start time(s)]\n", arg_name);
 }
 
-void addSpectrum(TString filename, TString name, PeriodicPattern pattern, PeriodicCuts cuts, PeriodicSpectrum **sum, double mult)
+void addSpectrum(TString filename, string name, PeriodicPattern pattern, PeriodicCuts cuts, PeriodicSpectrum **sum, double mult)
 {
 	// construct spectrum
 	PeriodicSpectrum spectrum(filename, name, pattern, cuts, mult);
-	spectrum.LoadFile();
-	spectrum.GetTriggerPattern();
-	spectrum.MakeHistogram();
+	spectrum.loadFile();
+	spectrum.getTriggerPattern();
+	spectrum.makeHistogram();
 
 	if (*sum)
 		(*sum)->add(spectrum);
 	else
 	{
-		*sum = new PeriodicSpectrum("sum", "sum_hist", spectrum);
+		*sum = new PeriodicSpectrum(name, name+"_hist", spectrum);
 		if (not *sum)
 		{
 			cout << "Error making sum spectrum." << endl;
 			exit(1);
 		}
+        cout << "making new PeriodicSpectrum with name " << name << endl;
 	}
 }
 
 int main (int arg_c, char **arg_v)
 {
  	TApplication app("PMT Spectrum Analysis", &arg_c, arg_v);
-	int N = 4;
+	int file_count = 3;
 	//TString name[N] = {"Ce139", "Cd139", "Sn113", "Bi207", "background"};
-	TString name[] = {"Bi207", "Bi207", "Bi207", "background"};
-	TString run[] = {"3851", "3854", "3855", "3800"};
+	//TString name[] = {"Bi207", "Bi207", "Bi207", "background"};
+	string name[] = {"Bi207", "Bi207", "background"};
+	TString run[] = {"3854", "3855", "3800"};
 	//int  run[] = {3814, 3800};
-	double mult[] = {+1, +1, +1, -3};
-	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
+	//double mult[] = {+1, +1, -3};
+	//TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
+	TString root_data_dir("/media/ucnbdata/Data/processed/"); 
 	PeriodicPattern pattern;
 	PeriodicCuts cuts;
 
@@ -151,16 +155,19 @@ int main (int arg_c, char **arg_v)
 	cuts.lower_time_cut = pattern.scan_time * 0.1;
 	cuts.upper_time_cut = pattern.scan_time * 0.9;
 
-
-	PeriodicSpectrum* sum = 0;
-	for (int i = 0; i < N; i++)
+	//PeriodicSpectrum* sum = 0;
+	map<string,PeriodicSpectrum*> sum;
+	for (int i = 0; i < file_count; i++)
 	{
   		// construct run filename
 		TString filename(root_data_dir + "/run" + run[i] + ".root");
 
 		// add in the new data
-		addSpectrum(filename, name[i], pattern, cuts, &sum, mult[i]);
-		if (not sum)
+        //PeriodicSpectrum *this_sum = sum[name[i]];
+        if (sum.find(name[i]) == sum.end())
+            sum[name[i]] = 0; 
+	    addSpectrum(filename, name[i], pattern, cuts, &sum[name[i]], 1);
+		if (not sum[name[i]])
 		{
 			cout << "no sum made" << endl;
 			exit(1);
@@ -173,6 +180,7 @@ int main (int arg_c, char **arg_v)
   	gStyle->SetPalette(1);
   	gStyle->SetOptStat("");
 
+/*
 	// Draw 2D histogram
 	TCanvas* canvas2D = new TCanvas("time_area_hist_canvas", "Beta spectrum and background", 1920/2, 1080/2);
 	sum->area_time_hist->Draw("colz");
@@ -180,25 +188,27 @@ int main (int arg_c, char **arg_v)
 	// Draw 1D time histogram 
 	TCanvas* time_canvas1D = new TCanvas("time_hist_canvas", "Time sequence", 1920/2, 1080/2);
 	sum->time_hist->SetLineColor(2);
-	//foreground->time_hist->SetAxisRange(0,1000,"Y");
 	sum->time_hist->Draw("");
-
-/*
-	if (background)
-	{
-		background->time_hist->SetLineColor(4);
-		diff_time_hist->SetLineColor(1);
-		background->time_hist->Draw("same");
-		diff_time_hist->Draw("same");
-	}
-
-	TLatex latex;
-	latex.DrawLatex(200,200, "#tau = ");
 */
+
 	// Draw 1D area histogram
-	TCanvas* area_canvas1D = new TCanvas("area_hist_canvas", "Visible energy spectrum", 1920/2, 1080/2);
-	sum->area_hist->SetLineColor(2);
-	sum->area_hist->Draw("");
+	TCanvas* area_canvas1D = new TCanvas("area_hist_canvas", "Calibration energy spectrum", 1920/2, 1080/2);
+    PeriodicSpectrum* calibration = sum["Bi207"];
+    PeriodicSpectrum* background = sum["background"];
+    calibration->scaleToRealTime();
+    background->scaleToRealTime();
+    calibration->add(*background,-1);
+    if (calibration)
+    {
+	    calibration->area_hist->SetLineColor(2);
+	    calibration->area_hist->Draw("");
+    }
+    else
+  	{
+		printf("couldn't find token in map\n");
+		exit(1);
+  	}
+        
 /*
 	if (background)
 	{
@@ -216,12 +226,15 @@ int main (int arg_c, char **arg_v)
 	double back_counts = sum->area_hist->Integral();
 	double fore_counts = diff_area_hist->Integral();
 */
+
+/*
 	double sum_counts = sum->area_hist->Integral();
 	cout << "Number of cycles is " << cycles << endl;
 	cout << "Time window is " << time_window / 1E9 << " sec" << endl;
 	cout << "live time is " << live_time / 1E9 << " sec" << endl;
 	cout << "Differance count is " << sum_counts << endl;
 	cout << "Difference rate is " << 1E9 * sum_counts / live_time << " Hz" << endl;
+*/
 
     app.Run();
 

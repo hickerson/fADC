@@ -59,6 +59,12 @@ struct PeriodicCuts
 	Long64_t upper_time_cut;
 };
 
+struct Timming
+{
+    Long64_t real;
+    Long64_t live;
+    Long64_t dead;
+};
 
 /**
  * PeriodicSpectrum
@@ -73,6 +79,7 @@ struct PeriodicSpectrum
 	PeriodicPattern pattern;
 	PeriodicCuts cuts;
 	double multiplier;
+    Timming time;
 
   	TFile* file;
   	TTree* tree;
@@ -87,10 +94,14 @@ public:
 	//PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier);
 	PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, PeriodicCuts _cuts, double _multiplier);
 	PeriodicSpectrum(TString _filename, TString _hist_name, const PeriodicSpectrum& _copy);
-	int MakeHistogram();
-	int LoadFile();
+
+	int makeHistogram();
+	int loadFile();
 	void add(const PeriodicSpectrum &spectrum);
-	PeriodicPattern GetTriggerPattern();
+	void add(const PeriodicSpectrum &spectrum, double s);
+	PeriodicPattern getTriggerPattern();
+    int scaleToRealTime();
+    int scale(double scale);
 };
 
 #endif

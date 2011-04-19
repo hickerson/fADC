@@ -163,9 +163,9 @@ int main (int arg_c, char **arg_v)
 	foreground = new PeriodicSpectrum(foreground_filename, "foreground", foreground_pattern, cuts, +1);
 	if (foreground)
 	{
-		foreground->LoadFile();
-		foreground->GetTriggerPattern();
-		foreground->MakeHistogram();
+		foreground->loadFile();
+		foreground->getTriggerPattern();
+		foreground->makeHistogram();
 	}
 
 	if (background_run)
@@ -174,9 +174,9 @@ int main (int arg_c, char **arg_v)
 		background = new PeriodicSpectrum(background_filename, "background", background_pattern, cuts, -1);
 		if (background)
 		{
-			background->LoadFile();
-			background->GetTriggerPattern();
-			background->MakeHistogram();
+			background->loadFile();
+			background->getTriggerPattern();
+			background->makeHistogram();
 		}
 	}
 
