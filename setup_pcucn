@@ -2,3 +2,5 @@
 
 export UCNb_PROCESSED_DATA_DIR=/home/daq/ucnb/data/processed/
 export UCNb_RAW_DATA_DIR=/home/daq/ucnb/data/raw/
+echo $UCNb_PROCESSED_DATA_DIR
+echo $UCNb_RAW_DATA_DIR

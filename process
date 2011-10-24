@@ -2,7 +2,7 @@
 
 if [ $# -eq 0 ]
 then
-	echo "Usage:${0##*/} [-f|--force] [-a|--all] <run number>"
+	echo "Usage: ${0##*/} [-f|--force] [-a|--all] <run number>"
 	exit 1
 fi
 
@@ -10,33 +10,37 @@ fi
 FORCE=false
 ALL=false
 CMD_LOG_FILE=command-list-file.log
+CLUSTER_LIST_FILE=cluster-list
 
 while [ $# -gt 0 ]
 do
 	case $1 in
-		-*a*|--all)
+		-a|--all)
 			ALL=true
 			i=1
 			;;
-		-*f*|--force)
+		-f|--force)
 			FORCE=true
 			;;
 		-*)
 			echo "unrecognized option"
+			echo "Usage: ${0##*/} [-f|--force] [-a|--all] <run number>"
+			exit 1
 			;;
 		*[!0-9]*)
 			echo "Need a run number"
+			echo "Usage: ${0##*/} [-f|--force] [-a|--all] <run number>"
 			exit 1
 			;;
 		*)
 			i=$1
-			echo i
+			echo "starting with run number $i"
 			;;
 	esac
 	shift
 done
 	
-if [ $ALL ] 
+if [ $ALL == true ] 
 then 
 	MAX=100000
 else
@@ -50,18 +54,30 @@ fi
 
 while [ $i -lt $MAX ]
 do
-	if [ -r $UCNb_RAW_DATA_DIR/run$i.fat ]
+	rawname=$UCNb_RAW_DATA_DIR/run$i.fat
+	procname=$UCNb_PROCESSED_DATA_DIR/run$i.root
+	if [ -r $rawname ]
 	then
-		if [ $FORCE ]
+		if [ $FORCE == true ]
 		then
-			rm -f $UCN_PROCESSED_DATA_DIR/run$i.root
+			rm -f $procname
 		fi
-		if [ ! -f $UCN_PROCESSED_DATA_DIR/run$i.root ]
+		if [ ! -f $procname ]
 		then
-			echo "./analysisUCNb run$i.fat" >> $CMD_LOG_FILE
+			echo "./analysisUCNb $rawname $procname" >> $CMD_LOG_FILE
+			#./analysisUCNb $rawname $procname #> $procname.log
+			echo $rawname
+			echo $procname
+		else
+			echo "file $procname exists! Skipping..."
 		fi
 	fi
-	(( i++ ))
+	i=`expr $i + 1`
 done
 
-parallel < $CMD_LOG_FILE
+if [ -f $CLUSTER_LIST_FILE ]
+then
+    parallel --sshloginfile $CLUSTER_LIST_FILE < $CMD_LOG_FILE
+else
+    parallel < $CMD_LOG_FILE
+fi

@@ -16,7 +16,7 @@
 #include <TF1.h>
 #include <TLatex.h>
 
-// STL includes
+// STL INCLUDES
 #include <vector>
 #include <string>
 
@@ -37,11 +37,13 @@ using namespace std;
  */
 struct PeriodicPattern
 {
+    //Long64_t time[2][2];
+    //Interval<Long_t> ...
+
 	Long64_t start_time;
 	Long64_t stop_time;
 	Long64_t scan_time;
 	Long64_t max_time;
-
 };
 
 
@@ -75,7 +77,7 @@ struct Timming
 struct PeriodicSpectrum
 {
 	TString filename;
-	TString hist_name;
+	TString name;
 	PeriodicPattern pattern;
 	PeriodicCuts cuts;
 	double multiplier;
