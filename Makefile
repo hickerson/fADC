@@ -21,6 +21,9 @@ analysisUCNb: analysisUCNb.o Dictionary.o
 spectrum_analyser: spectrum_analyser.o Dictionary.o
 	$(LD) -O0 -g $(LDFLAGS) $^ $(ROOTLIBS) -o $@
 
+full_analyser: full_analyser.o Dictionary.o PeriodicSpectrum.o
+	$(LD) -O0 -g $(LDFLAGS) $^ $(ROOTLIBS) -o $@
+
 %.o:: %.cc
 	$(CXX) $(CXXFLAGS) -Wno-deprecated -c $< -o $@
 

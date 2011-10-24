@@ -78,6 +78,8 @@ struct PeriodicSpectrum
 {
 	TString filename;
 	TString name;
+	TString type;
+
 	PeriodicPattern pattern;
 	PeriodicCuts cuts;
 	double multiplier;
@@ -85,6 +87,7 @@ struct PeriodicSpectrum
 
   	TFile* file;
   	TTree* tree;
+
 	TH1F* trigger_hist; 
 	TH1F* time_hist; 
 	TH1F* area_hist;
@@ -94,7 +97,8 @@ struct PeriodicSpectrum
 
 public:
 	//PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier);
-	PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, PeriodicCuts _cuts, double _multiplier);
+	PeriodicSpectrum(TString _name, TString _type);
+	PeriodicSpectrum(TString _filename, TString _hist_name, TString _type, PeriodicPattern _pattern, PeriodicCuts _cuts, double _multiplier);
 	PeriodicSpectrum(TString _filename, TString _hist_name, const PeriodicSpectrum& _copy);
 
 	int makeHistogram();

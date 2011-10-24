@@ -6,11 +6,34 @@
  */
 #include "PeriodicSpectrum.hh"
 
-PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, 
+PeriodicSpectrum::PeriodicSpectrum(TString _name, TString _type)
+{
+	filename = "";
+	name = _name;
+	type = _type;
+
+/*
+	pattern = 0;
+	cuts = 0;
+	multiplier = 0;
+*/
+  	file = 0;
+  	tree = 0;
+	time_hist = 0; 
+	area_hist = 0;
+	area_time_hist = 0;
+
+    time.live = 0;
+    time.real = 0;
+    time.dead = 0;
+}
+
+PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _name, TString _type,
 						PeriodicPattern _pattern, PeriodicCuts _cuts, double _multiplier)
 {
 	filename = _filename;
-	hist_name = _hist_name;
+	name = _name;
+	type = _type;
 
 	pattern = _pattern;
 	cuts = _cuts;
@@ -27,10 +50,10 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name,
     time.dead = 0;
 }
 
-PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, const PeriodicSpectrum& copy)
+PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _name, const PeriodicSpectrum& copy)
 {
 	filename = _filename;
-	hist_name = _hist_name;
+	name = _name;
 
 	pattern = copy.pattern;
 	cuts = copy.cuts;
@@ -51,7 +74,7 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, const 
 
 PeriodicPattern PeriodicSpectrum::getTriggerPattern()
 {
-	
+	// ...
 }
 
 int PeriodicSpectrum::scaleToRealTime()
@@ -141,10 +164,10 @@ int PeriodicSpectrum::loadFile()
 
 int PeriodicSpectrum::makeHistogram()
 {
-	area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
+	area_time_hist = new TH2F(name+"_area_time_hist", "Counts per time and area", 
 				   cuts.time_bin_count, 0, pattern.scan_time/1E9, cuts.area_bin_count, 0, cuts.max_area);
-	time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", int(cuts.time_fine_ratio*cuts.time_bin_count), 0, pattern.scan_time/1E9);
-	area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", int(cuts.area_fine_ratio*cuts.area_bin_count), 0, cuts.max_area);
+	time_hist = new TH1F(name+"_time_hist", "Counts per time", int(cuts.time_fine_ratio*cuts.time_bin_count), 0, pattern.scan_time/1E9);
+	area_hist = new TH1F(name+"_area_hist", "Visible energy", int(cuts.area_fine_ratio*cuts.area_bin_count), 0, cuts.max_area);
 	
 	Long64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
