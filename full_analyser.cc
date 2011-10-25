@@ -111,7 +111,7 @@ int main (int arg_c, char **arg_v)
   	}
 */
 	int rootarg_c = 0;
- 	//TApplication app("Ge Spectrum Analysis", &rootarg_c, 0);
+ 	TApplication app("Ge Spectrum Analysis", &rootarg_c, 0);
 
 /*
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
@@ -128,12 +128,23 @@ int main (int arg_c, char **arg_v)
 	//int max_area = 4096*200;
 	int max_area = 4096;
 
-/*
+	/*
 	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
   		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());
 	else
   		printf("Number of entries in the tree.%e\n", (double) beta_tree->GetEntries());
+	*/
 
+	TString draw_cmd("(maxInterp) >> %s");
+ 	TCut *beta_cut = new TCut("(channel==17) && ((maxSample-pedestal) < 2750) && (area > 0)");
+	TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
+	beta_tree->Draw(beta_draw_cmd, *beta_cut);
+	diff_hist->Add(back_hist, -1.0);
+	beta_hist->Draw();
+	back_hist->Draw("same");
+	diff_hist->Draw("same");
+
+	/*	
 	// This will be in a loop soon -->
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
@@ -160,9 +171,8 @@ int main (int arg_c, char **arg_v)
 	beta_hist->Draw();
 	back_hist->Draw("same");
 	diff_hist->Draw("same");
-	//canvas.Print(
+	*/
 
     app.Run();
-*/
     return 0;
 }
