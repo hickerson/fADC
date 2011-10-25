@@ -18,7 +18,7 @@ PeriodicSpectrum::PeriodicSpectrum(TString _name, TString _type)
 	multiplier = 0;
 */
   	file = 0;
-  	tree = 0;
+  	tree = new TChain();
 	time_hist = 0; 
 	area_hist = 0;
 	area_time_hist = 0;
@@ -134,6 +134,14 @@ void PeriodicSpectrum::add(const PeriodicSpectrum &spectrum, double s)
     time.real += spectrum.time.real;
     time.live += spectrum.time.live;
     time.dead += spectrum.time.dead;
+}
+
+int PeriodicSpectrum::addToChain(const char * _filename)
+{
+	if (tree == 0)	
+		tree = new TChain();
+		
+	((TChain*)tree)->Add(_filename);
 }
 
 int PeriodicSpectrum::loadFile()

@@ -4,6 +4,7 @@
 // ROOT INCLUDES
 #include <TFile.h>
 #include <TTree.h>
+#include <TChain.h>
 #include <TString.h>
 #include <TCut.h>
 #include <TProfile.h>
@@ -105,6 +106,7 @@ public:
 	int loadFile();
 	void add(const PeriodicSpectrum &spectrum);
 	void add(const PeriodicSpectrum &spectrum, double s);
+	int addToChain(const char *_filename);
 	PeriodicPattern getTriggerPattern();
     int scaleToRealTime();
     int scale(double scale);
