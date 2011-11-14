@@ -18,7 +18,7 @@ spectrum_analyser: spectrum_analyser.o Dictionary.o
 full_analyser: full_analyser.o Dictionary.o PeriodicSpectrum.o
 	$(LD) -O0 -g $(LDFLAGS) $^ $(ROOTLIBS) -o $@
 
-mega_analyser: mega_analyser.o Dictionary.o RunGroup.o
+mega_analyser: mega_analyser.o Dictionary.o RunGroup.o Spectrum.o Run.o
 	$(LD) -O0 -g $(LDFLAGS) $^ $(ROOTLIBS) -o $@
 
 %.o:: %.cc

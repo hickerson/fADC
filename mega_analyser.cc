@@ -23,7 +23,6 @@
 #include <vector>
 
 // INCLUDES
-//#include "PeriodicSpectrum.hh"
 #include "RunGroup.hh"
 
 #define NUM_PMTS 1
