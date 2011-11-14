@@ -23,7 +23,8 @@
 #include <vector>
 
 // INCLUDES
-#include "PeriodicSpectrum.hh"
+//#include "PeriodicSpectrum.hh"
+#include "RunGroup.hh"
 
 #define NUM_PMTS 1
 
@@ -40,8 +41,7 @@ void usage(const char * arg_name)
 
 int main (int arg_c, char **arg_v)
 {
-	opterr = 0;
-	int c;
+	opterr = 0; int c;
 	while ((c = getopt(arg_c, arg_v, "f:b:s:")) != -1)
 	{
 		int run = 0;
@@ -79,13 +79,15 @@ int main (int arg_c, char **arg_v)
 	}
 
 	int rootarg_c = 0;
- 	TApplication app("Ge Spectrum Analysis", &rootarg_c, 0);
+ 	//TApplication app("Mega Spectrum Analysis", &rootarg_c, 0);
+
+	RunGroup runGroup("test.json");
 
    // Plot options
   	gStyle->SetOptStat(1);
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
 
-    app.Run();
+    //app.Run();
     return 0;
 }
