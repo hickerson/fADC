@@ -7,7 +7,19 @@ CXXFLAGS        = -O0 -g -Wall -fPIC -I$(ROOTINC) $(ROOTCFLAGS) -I/usr/include
 CXX             = g++
 LD              = g++
 
-#git add *.cc *.hh *.h *.cxx buildUCNb
+
+all: mega_analyser 
+
+clean: 
+	rm *.o mega_analyser
+
+html:
+	doxygen
+	sudo cp -r ~/Public/sim /var/www
+
+commit:
+	git add *.cc *.hh *.h *.cxx Makefile
+	git commit -a
 
 analysisUCNb: analysisUCNb.o Dictionary.o
 	$(LD) -O0 -g $(LDFLAGS) $^ $(ROOTLIBS) -o $@
