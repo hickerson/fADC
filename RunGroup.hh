@@ -19,21 +19,19 @@ using namespace std;
  * Author: Kevin Peter Hickerson
  * Created: Sun Nov  6 13:46:20 PST 2011
  */
-class RunGroup
+class RunGroup : public Run
 {
-	std::string filename; /// name of the run log file
+	string filename; /// name of the run log file
 	vector<Run> runs; /// a list of runs as specified in the run log file
 
 public:
 	RunGroup() {};
 
-	RunGroup(std::string filename) {};
+	RunGroup(string filename) {};
 
-	/*
 	RunGroup(const RunGroup & copy)
 	{
 	}
-	*/
 
 	~RunGroup()
 	{

@@ -15,7 +15,7 @@ clean:
 
 html:
 	doxygen
-	sudo cp -r ~/Public/sim /var/www
+	sudo cp -r ~/Public/fADC /var/www
 
 commit:
 	git add *.cc *.hh *.h *.cxx Makefile
