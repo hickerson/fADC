@@ -25,12 +25,18 @@ class RunGroup : public Run
 	vector<Run> runs; /// a list of runs as specified in the run log file
 
 public:
-	RunGroup() {};
+	RunGroup()
+	{
+		puts("Empty default constructor for RunGroup");
+	};
 
-	RunGroup(string filename) {};
+	RunGroup(string _filename) :
+		filename(_filename)
+	{}
 
 	RunGroup(const RunGroup & copy)
 	{
+		puts("Empty copy constructor for RunGroup");
 	}
 
 	~RunGroup()

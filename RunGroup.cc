@@ -15,5 +15,6 @@ void RunGroup::load()
 	using boost::property_tree::ptree;
 	ptree pt;
 	read_json(filename, pt);	
+
 }
 

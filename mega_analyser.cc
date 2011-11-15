@@ -81,6 +81,7 @@ int main (int arg_c, char **arg_v)
  	//TApplication app("Mega Spectrum Analysis", &rootarg_c, 0);
 
 	RunGroup runGroup("test.json");
+	runGroup.load();
 
    // Plot options
   	gStyle->SetOptStat(1);
