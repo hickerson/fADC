@@ -18,7 +18,7 @@ html:
 	sudo cp -r ~/Public/fADC /var/www
 
 commit:
-	git add *.cc *.hh *.h *.cxx Makefile
+	git add *.c *.h *.cc *.hh *.cxx *.hxx *.cpp *.hpp Makefile
 	git commit -a
 
 analysisUCNb: analysisUCNb.o Dictionary.o

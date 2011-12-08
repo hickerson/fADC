@@ -172,10 +172,8 @@ int PeriodicSpectrum::loadFile()
 
 int PeriodicSpectrum::makeHistogram()
 {
-	area_time_hist = new TH2F(name+"_area_time_hist", "Counts per time and area", 
-				   cuts.time_bin_count, 0, pattern.scan_time/1E9, cuts.area_bin_count, 0, cuts.max_area);
-	time_hist = new TH1F(name+"_time_hist", "Counts per time", int(cuts.time_fine_ratio*cuts.time_bin_count), 0, pattern.scan_time/1E9);
-	area_hist = new TH1F(name+"_area_hist", "Visible energy", int(cuts.area_fine_ratio*cuts.area_bin_count), 0, cuts.max_area);
+	time_hist = new TH1F(name+"_time_hist", "Counts per time", 
+					int(cuts.time_fine_ratio*cuts.time_bin_count), 0, pattern.scan_time/1E9);
 	
 	Long64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();

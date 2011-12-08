@@ -34,6 +34,7 @@ using namespace std;
 typedef Long64_t NanoSeconds;
 
 #define NUM_CHANNELS 8
+#define TSTRING(s) (TString(s))
 
 /**
  * Run
@@ -41,11 +42,11 @@ typedef Long64_t NanoSeconds;
  * Author: Kevin Peter Hickerson
  * Created: Sat Nov  5 18:06:55 PDT 2011
  */
-class Run
+struct Run
 {
-	TString name;
-	TString type;
-	TString date;
+	string name;
+	string type;
+	string date;
 	//Spectrum* spectrum[NUM_CH];
 	TFile* file;
 	TTree* tree;
@@ -58,10 +59,16 @@ class Run
 	NanoSeconds cycle_time;
 	NanoSeconds live_time;
 	NanoSeconds dead_time;
+	NanoSeconds real_time;
+	NanoSeconds scan_time;
 
 public:
+	Run()
+	{
+		puts("Empty constructor for Run");
+	}
+	
 /*
-	Run();
 	Run(const Run & copy);
 	Run(TString fileline);
 */
@@ -72,6 +79,7 @@ public:
 	
 	Run & operator = (const Run & other)
     {
+		puts("Empty copy operator for Run");
         if (this != &other) // protect against invalid self-assignment
         {
             // 1: allocate new memory and copy the data
@@ -82,6 +90,8 @@ public:
     }
 
 	//void syncronize(int channel);
+
+	NanoSeconds setTrigger();
 };
 
 #endif

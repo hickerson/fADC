@@ -8,8 +8,10 @@
 #include "Run.hh"
 #include "Spectrum.hh"
 
+#include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+
 
 using namespace std;
 
@@ -19,10 +21,10 @@ using namespace std;
  * Author: Kevin Peter Hickerson
  * Created: Sun Nov  6 13:46:20 PST 2011
  */
-class RunGroup : public Run
+struct RunGroup : public Run
 {
 	string filename; /// name of the run log file
-	vector<Run> runs; /// a list of runs as specified in the run log file
+	vector<Run*> runs; /// a list of runs as specified in the run log file
 
 public:
 	RunGroup()
@@ -56,9 +58,11 @@ public:
         return *this;
     }
 
-	void addRun(const Run &run);
-	Spectrum& getSpectrum(string foreground_name, string background_name);
-	Spectrum& getSpectrum(string foreground_name, string background_name, int channel);
+	//void addRun(const Run &run);
+	void addRun(Run *run);
+
+	//Spectrum& getSpectrum(string foreground_name, string background_name);
+	//Spectrum& getSpectrum(string foreground_name, string background_name, int channel);
 	void load(); 
 };
 
