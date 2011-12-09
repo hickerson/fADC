@@ -71,9 +71,10 @@ TH1F* Run::getTimeHistogram(int channel) {
 
 
 TH1F* Run::getEnergyHistogram(int channel) {
-	int bin_count = 100;
+	int bin_count = 1000;
+	int range = 16000;
 
-	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), 0, 100);
+	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), 0, range);
 	
 	int64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();

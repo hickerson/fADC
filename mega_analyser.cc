@@ -108,25 +108,36 @@ int main (int arg_c, char **arg_v)
 	TH1F* beta_hist = new TH1F(beta_hist_name, "Ge events", bin_count, 0, max_area);
 	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
 	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
+
 	TH1F* time_hist = run->getTimeHistogram(20);
+	TH1F* energy_hist = run->getEnergyHistogram(20);
 	
 	beta_hist->SetLineColor(2);
 	back_hist->SetLineColor(4);
 	diff_hist->SetLineColor(1);
-	TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 	//run->tree->Draw(beta_draw_cmd, *beta_cut);
 	//beta_tree->Draw(diff_draw_cmd, *beta_cut);
 	//back_tree->Draw(back_draw_cmd, *beta_cut);
 	
 	diff_hist->Add(back_hist, -1.0);
 
-	time_hist->Draw();
+
+	{
+		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
+		time_hist->Draw();
+		TString data_pdf_filename = "Xe.time.pdf";
+		canvas->SaveAs(data_pdf_filename);
+	}
+
+	{
+		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
+		energy_hist->Draw();
+		TString data_pdf_filename = "Xe.energy.pdf";
+		canvas->SaveAs(data_pdf_filename);
+	}
 	//beta_hist->Draw();
 	//back_hist->Draw("same");
 	//diff_hist->Draw("same");
-
-	TString data_pdf_filename = "Xe.runlog.pdf";
-	canvas->SaveAs(data_pdf_filename);
 
     //app.Run();
     return 0;
