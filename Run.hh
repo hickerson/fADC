@@ -56,11 +56,10 @@ struct Run
 	NanoSeconds stop_time;
 	NanoSeconds cycle_start_time;
 	NanoSeconds cycle_stop_time;
-	NanoSeconds cycle_time;
+	NanoSeconds scan_time;
 	NanoSeconds live_time;
 	NanoSeconds dead_time;
 	NanoSeconds real_time;
-	NanoSeconds scan_time;
 
 public:
 	Run()
@@ -92,6 +91,7 @@ public:
 	//void syncronize(int channel);
 
 	NanoSeconds setTrigger();
+	TH1F* getTimeHistogram(int channel);
 };
 
 #endif
