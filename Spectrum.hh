@@ -55,7 +55,9 @@ struct Spectrum
 	TH1F* signal; 
 	bool verbose;
 
-	Spectrum();
+	Spectrum() {
+		puts("Empty default constructor");
+	}
 /*
 	Spectrum(TString _filename, TString _hist_name);
 	Spectrum(TString _filename, TString _hist_name, TTree* _tree);

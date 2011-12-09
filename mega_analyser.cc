@@ -35,7 +35,7 @@ using namespace std;
  */
 void usage(const char * arg_name) 
 {
-	printf("Usage: %s <signal run number> <background run number>\n", arg_name);
+	printf("Usage: %s <json runlog file>\n", arg_name);
 }
 
 int main (int arg_c, char **arg_v)
@@ -80,7 +80,8 @@ int main (int arg_c, char **arg_v)
 	int rootarg_c = 0;
  	//TApplication app("Mega Spectrum Analysis", &rootarg_c, 0);
 
-	RunGroup runGroup("Xe.runlog.json");
+	//RunGroup runGroup("Xe.runlog.json");
+	RunGroup runGroup(arg_v[1]);
 	runGroup.load();
 	
 	Run* run = runGroup.runs[0];
@@ -92,11 +93,14 @@ int main (int arg_c, char **arg_v)
 
 	int bin_count = 1024;
 	int max_area = 4096;
+	int channel = 17;
 
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
 	TString diff_hist_name("diff_spectrum_hist");
- 	TCut *beta_cut = new TCut("(channel==17) && ((maxSample-pedestal) < 2750) && (area > 0)");
+	char cut_str[1024];
+ 	sprintf(cut_str, "(channel==%d) && ((maxSample-pedestal) < 2750) && (area > 0)", 21);
+ 	TCut *beta_cut = new TCut(cut_str);
 
 	TString beta_draw_cmd("(maxInterp) >> "+beta_hist_name);
 	TString back_draw_cmd("(maxInterp) >> "+back_hist_name);
@@ -104,7 +108,7 @@ int main (int arg_c, char **arg_v)
 	TH1F* beta_hist = new TH1F(beta_hist_name, "Ge events", bin_count, 0, max_area);
 	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
 	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
-	TH1F* time_hist = run->getTimeHistogram(21);
+	TH1F* time_hist = run->getTimeHistogram(20);
 	
 	beta_hist->SetLineColor(2);
 	back_hist->SetLineColor(4);

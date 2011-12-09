@@ -23,8 +23,10 @@ using namespace std;
  */
 struct RunGroup : public Run
 {
-	string filename; /// name of the run log file
-	vector<Run*> runs; /// a list of runs as specified in the run log file
+	string filename; 				/// name of the run log file
+	vector<Run*> runs; 				/// a list of runs as specified in the run log file
+	Spectrum beta;					/// ...
+	Spectrum Ge;					/// ...
 
 public:
 	RunGroup()
