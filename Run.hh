@@ -90,8 +90,10 @@ public:
 
 	//void syncronize(int channel);
 
-	NanoSeconds setTrigger();
+	int64_t setTrigger();
 	TH1F* getTimeHistogram(int channel);
+	TH1F* getEnergyHistogram(int channel);
+	TH1F* getEnergyHistogram(vector<int> channels);
 };
 
 #endif
