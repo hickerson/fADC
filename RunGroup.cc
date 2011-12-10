@@ -1,5 +1,23 @@
 #include "RunGroup.hh"
 
+void RunGroup::init() 
+{
+	name = "";
+	type = "";
+	date = "";
+	file = 0;
+	tree = 0;
+	for (int i = 0; i < NUM_CHANNELS; i++)
+		spectra[i] = 0;
+	sync = 0;
+	start_time = 0;
+	stop_time = 0;
+	cycle_start_time = 0;
+	cycle_stop_time = 0;
+	live_time = 0;
+	dead_time = 0;
+}		
+
 
 //void RunGroup::addRun(const Run &run)
 void RunGroup::addRun(Run *run)
@@ -86,12 +104,14 @@ TH1F* RunGroup::getEnergyHistogram(int channel)
 	int bin_count = 100;
 	int range = 16000;
 
-	if (not spectra[channel]->singnal)
-		spectra[channel]->single = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, 0, range);
+	if (not spectra[channel]->foreground)
+		spectra[channel]->foreground = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, 0, range);
 
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
 		TH1F* _hist = runs[i]->getEnergyHistogram(channel);
-		spectra[channel]->signal->Add(_hist, 1.0);
+		spectra[channel]->foreground->Add(_hist, 1.0);
 		delete _hist;
 	}
+
+	return spectra[channel]->foreground;
 }

@@ -23,21 +23,26 @@ using namespace std;
  */
 struct RunGroup : public Run
 {
-	string filename; 				/// name of the run log file
-	vector<Run*> runs; 				/// a list of runs as specified in the run log file
-	vector<Spectra*>(8);            /// the spectrum of each channel
-	Spectrum pmt;					/// ...
-	Spectrum Ge;					/// ...
+	string 			filename; 				/// name of the run log file
+	vector<Run*> 	runs; 					/// a list of runs as specified in the run log file
+	Spectrum* 		spectra[NUM_CHANNELS];  /// the spectrum of each channel
+	Spectrum 		pmt;					/// ...
+	Spectrum 		Ge;						/// ...
+
+private:
+	void init();
 
 public:
 	RunGroup()
 	{
-		puts("Empty default constructor for RunGroup");
-	};
+		init();
+	}
 
-	RunGroup(string _filename) :
-		filename(_filename)
-	{}
+	RunGroup(string _filename)
+	{
+		init();
+		filename = _filename;
+	}
 
 	RunGroup(const RunGroup & copy)
 	{
