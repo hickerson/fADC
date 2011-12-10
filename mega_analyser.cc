@@ -93,13 +93,13 @@ int main (int arg_c, char **arg_v)
 
 	int bin_count = 1024;
 	int max_area = 4096;
-	int channel = 17;
+	int channel = 20;
 
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
 	TString diff_hist_name("diff_spectrum_hist");
 	char cut_str[1024];
- 	sprintf(cut_str, "(channel==%d) && ((maxSample-pedestal) < 2750) && (area > 0)", 21);
+ 	sprintf(cut_str, "(channel==%d) && ((maxSample-pedestal) < 2750) && (area > 0)", channel);
  	TCut *beta_cut = new TCut(cut_str);
 
 	TString beta_draw_cmd("(maxInterp) >> "+beta_hist_name);
@@ -109,8 +109,6 @@ int main (int arg_c, char **arg_v)
 	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
 	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
 
-	TH1F* time_hist = run->getTimeHistogram(20);
-	TH1F* energy_hist = run->getEnergyHistogram(20);
 	
 	beta_hist->SetLineColor(2);
 	back_hist->SetLineColor(4);
@@ -123,6 +121,7 @@ int main (int arg_c, char **arg_v)
 
 
 	{
+		TH1F* time_hist = run->getTimeHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		time_hist->Draw();
 		TString data_pdf_filename = "Xe.time.pdf";
@@ -130,6 +129,16 @@ int main (int arg_c, char **arg_v)
 	}
 
 	{
+		TH1F* energy_hist = run->getEnergyHistogram(channel);
+		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
+		energy_hist->Draw();
+		string data_pdf_filename = "Xe.energy.";
+		data_pdf_filename += channel + ".pdf";
+		canvas->SaveAs(data_pdf_filename.c_str());
+	}
+
+	{
+		TH1F* energy_hist = runGroup.getEnergyHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		energy_hist->Draw();
 		TString data_pdf_filename = "Xe.energy.pdf";
