@@ -25,7 +25,8 @@ struct RunGroup : public Run
 {
 	string filename; 				/// name of the run log file
 	vector<Run*> runs; 				/// a list of runs as specified in the run log file
-	Spectrum beta;					/// ...
+	vector<Spectra*>(8);            /// the spectrum of each channel
+	Spectrum pmt;					/// ...
 	Spectrum Ge;					/// ...
 
 public:
@@ -66,6 +67,8 @@ public:
 	//Spectrum& getSpectrum(string foreground_name, string background_name);
 	//Spectrum& getSpectrum(string foreground_name, string background_name, int channel);
 	void load(); 
+
+	TH1F* getEnergyHistogram(int channel);
 };
 
 #endif

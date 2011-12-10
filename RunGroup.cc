@@ -80,3 +80,18 @@ void RunGroup::load()
 	}
 }
 
+
+TH1F* RunGroup::getEnergyHistogram(int channel) 
+{
+	int bin_count = 100;
+	int range = 16000;
+
+	if (not spectra[channel]->singnal)
+		spectra[channel]->single = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, 0, range);
+
+	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
+		TH1F* _hist = runs[i]->getEnergyHistogram(channel);
+		spectra[channel]->signal->Add(_hist, 1.0);
+		delete _hist;
+	}
+}

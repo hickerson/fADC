@@ -87,7 +87,7 @@ int main (int arg_c, char **arg_v)
 	Run* run = runGroup.runs[0];
 	
     // Plot options
-  	gStyle->SetOptStat(1);
+  	gStyle->SetOptStat(0);
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
 
