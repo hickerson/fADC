@@ -29,6 +29,10 @@ struct RunGroup : public Run
 	Spectrum 		pmt;					/// ...
 	Spectrum 		Ge;						/// ...
 
+	int bin_count;
+	int min_area;
+	int max_area;
+
 private:
 	void init();
 

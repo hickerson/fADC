@@ -70,11 +70,9 @@ TH1F* Run::getTimeHistogram(int channel) {
 }
 
 
-TH1F* Run::getEnergyHistogram(int channel) {
-	int bin_count = 100;
-	int range = 40000;
-
-	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), 0, range);
+TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max) 
+{
+	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), min, max);
 	
 	int64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
@@ -126,6 +124,7 @@ TH1F* Run::getEnergyHistogram(int channel) {
 }
 
 
-TH1F* Run::getEnergyHistogram(vector<int> channels) {
+TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int max) 
+{
 	puts("tbd...");
 }

@@ -77,7 +77,7 @@ int main (int arg_c, char **arg_v)
 
 	}
 
-	int rootarg_c = 0;
+	//int rootarg_c = 0;
  	//TApplication app("Mega Spectrum Analysis", &rootarg_c, 0);
 
 	//RunGroup runGroup("Xe.runlog.json");
@@ -93,8 +93,9 @@ int main (int arg_c, char **arg_v)
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
 
-	int bin_count = 1024;
-	int max_area = 4096;
+	runGroup.bin_count = 128;
+	runGroup.min_area = 0;
+	runGroup.max_area = 40960;
 	int channel = 20;
 
 /*
@@ -133,11 +134,11 @@ int main (int arg_c, char **arg_v)
 	}
 
 	{
-		TH1F* energy_hist = run->getEnergyHistogram(channel);
+		TH1F* energy_hist = run->getEnergyHistogram(channel, runGroup.bin_count, 0, runGroup.max_area);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		energy_hist->Draw();
 		char filename[1024]; 
-		sprintf(filename, "%s.energy.ch%d.pdf", arg_v[1], channel);
+		sprintf(filename, "%s.energy.run%d-ch%d.pdf", arg_v[1], run->number, channel);
 		canvas->SaveAs(filename);
 	}
 

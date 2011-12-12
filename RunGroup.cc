@@ -58,6 +58,10 @@ void RunGroup::load()
 		Run* run = new Run();
 
 		run->name = _filename;
+		run->date = child.second.get<string>("date");
+		run->number = child.second.get<int>("run");
+		run->type = child.second.get<string>("type");
+		run->real_time = child.second.get<NanoSeconds>("runtime");
 
 		// Open ntuple
 		//TFile* file = new TFile(TSTRING(run->name));
@@ -78,22 +82,6 @@ void RunGroup::load()
 			cout << "TTree not found in file " << run->name << endl;
 			exit(0);
 		}
-		/* for reference, members of Run
-		string name;
-		string type;
-		string date;
-		TFile* file;
-		TTree* tree;
-		TH1F* histogram[NUM_CHANNELS];
-		TH1F* sync;
-		NanoSeconds start_time;
-		NanoSeconds stop_time;
-		NanoSeconds cycle_start_time;
-		NanoSeconds cycle_stop_time;
-		NanoSeconds cycle_time;
-		NanoSeconds live_time;
-		NanoSeconds dead_time;
-		*/
 		addRun(run);
 	}
 }
@@ -101,14 +89,11 @@ void RunGroup::load()
 
 TH1F* RunGroup::getEnergyHistogram(int channel) 
 {
-	int bin_count = 100;
-	int range = 16000;
-
 	if (not spectra[channel]->foreground)
-		spectra[channel]->foreground = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, 0, range);
+		spectra[channel]->foreground = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
 
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
-		TH1F* _hist = runs[i]->getEnergyHistogram(channel);
+		TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
 		spectra[channel]->foreground->Add(_hist, 1.0);
 		delete _hist;
 	}

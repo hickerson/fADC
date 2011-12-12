@@ -32,6 +32,7 @@
 
 using namespace std;
 typedef Long64_t NanoSeconds;
+#define ns 1E9;
 
 #define NUM_CHANNELS 8
 #define TSTRING(s) (TString(s))
@@ -47,11 +48,14 @@ struct Run
 	string name;
 	string type;
 	string date;
+	int number;
+
 	//Spectrum* spectrum[NUM_CH];
 	TFile* file;
 	TTree* tree;
 	TH1F* histogram[NUM_CHANNELS];
 	TH1F* sync;
+	NanoSeconds real_time;
 	NanoSeconds start_time;
 	NanoSeconds stop_time;
 	NanoSeconds cycle_start_time;
@@ -59,7 +63,6 @@ struct Run
 	NanoSeconds scan_time;
 	NanoSeconds live_time;
 	NanoSeconds dead_time;
-	NanoSeconds real_time;
 
 public:
 	Run()
@@ -92,8 +95,8 @@ public:
 
 	int64_t setTrigger();
 	TH1F* getTimeHistogram(int channel);
-	TH1F* getEnergyHistogram(int channel);
-	TH1F* getEnergyHistogram(vector<int> channels);
+	TH1F* getEnergyHistogram(int channel, int bin_count, int min, int max);
+	TH1F* getEnergyHistogram(vector<int> channels, int bin_count, int min, int max);
 };
 
 #endif
