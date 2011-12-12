@@ -1,4 +1,5 @@
 #include "RunGroup.hh"
+#include <TMath.h>
 
 void RunGroup::init() 
 {
@@ -61,7 +62,8 @@ void RunGroup::load()
 		run->date = child.second.get<string>("date");
 		run->number = child.second.get<int>("run");
 		run->type = child.second.get<string>("type");
-		run->real_time = child.second.get<NanoSeconds>("runtime");
+		run->run_time = child.second.get<int>("runtime");
+		run->real_time = 1E9 * run->run_time;
 
 		// Open ntuple
 		//TFile* file = new TFile(TSTRING(run->name));
@@ -89,14 +91,30 @@ void RunGroup::load()
 
 TH1F* RunGroup::getEnergyHistogram(int channel) 
 {
-	if (not spectra[channel]->foreground)
-		spectra[channel]->foreground = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
+
+	//if (not spectra[channel]->foreground)
+	//	spectra[channel]->foreground = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
+	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
 
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
 		TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
-		spectra[channel]->foreground->Add(_hist, 1.0);
+		//spectra[channel]->foreground->Add(_hist, 1.0);
+		h->Add(_hist, 1.0);
 		delete _hist;
 	}
+
+	for (int i = 0; i < bin_count; i++)
+		//spectra[channel]->foreground->SetBinError(i, TMath::Sqrt(spectra[channel]->foreground->GetBinContent(i)));
+		h->SetBinError(i, TMath::Sqrt(h->GetBinContent(i)));
+
+	return h;
+	//return spectra[channel]->foreground;
+}
+
+TH1F* RunGroup::setForegroundHistogram(int channel)
+{
+	if (not spectra[channel]->foreground)
+		spectra[channel]->foreground = getEnergyHistogram(channel);
 
 	return spectra[channel]->foreground;
 }

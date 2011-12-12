@@ -78,6 +78,7 @@ public:
 	void load(); 
 
 	TH1F* getEnergyHistogram(int channel);
+	TH1F* setForegroundHistogram(int channel);
 };
 
 #endif

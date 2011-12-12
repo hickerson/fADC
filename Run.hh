@@ -49,12 +49,14 @@ struct Run
 	string type;
 	string date;
 	int number;
+	int run_time;
 
 	//Spectrum* spectrum[NUM_CH];
 	TFile* file;
 	TTree* tree;
 	TH1F* histogram[NUM_CHANNELS];
 	TH1F* sync;
+
 	NanoSeconds real_time;
 	NanoSeconds start_time;
 	NanoSeconds stop_time;
