@@ -81,7 +81,9 @@ int main (int arg_c, char **arg_v)
  	//TApplication app("Mega Spectrum Analysis", &rootarg_c, 0);
 
 	//RunGroup runGroup("Xe.runlog.json");
-	RunGroup runGroup(arg_v[1]);
+	string json_filename(arg_v[1]);
+	json_filename += ".json";
+	RunGroup runGroup(json_filename);
 	runGroup.load();
 	
 	Run* run = runGroup.runs[0];
@@ -124,25 +126,27 @@ int main (int arg_c, char **arg_v)
 		TH1F* time_hist = run->getTimeHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		time_hist->Draw();
-		TString data_pdf_filename = "Xe.time.pdf";
-		canvas->SaveAs(data_pdf_filename);
+		string data_pdf_filename = arg_v[1];
+		data_pdf_filename += ".time.pdf";
+		canvas->SaveAs(data_pdf_filename.c_str());
 	}
 
 	{
 		TH1F* energy_hist = run->getEnergyHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		energy_hist->Draw();
-		string data_pdf_filename = "Xe.energy.";
-		data_pdf_filename += channel + ".pdf";
-		canvas->SaveAs(data_pdf_filename.c_str());
+		char filename[1024]; 
+		sprintf(filename, "%s.energy.ch%d.pdf", arg_v[1], channel);
+		canvas->SaveAs(filename);
 	}
 
 	{
 		TH1F* energy_hist = runGroup.getEnergyHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		energy_hist->Draw();
-		TString data_pdf_filename = "Xe.energy.pdf";
-		canvas->SaveAs(data_pdf_filename);
+		string data_pdf_filename = arg_v[1];
+		data_pdf_filename += ".energy.pdf";
+		canvas->SaveAs(data_pdf_filename.c_str());
 	}
 	//beta_hist->Draw();
 	//back_hist->Draw("same");
