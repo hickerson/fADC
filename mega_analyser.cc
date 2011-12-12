@@ -97,6 +97,7 @@ int main (int arg_c, char **arg_v)
 	int max_area = 4096;
 	int channel = 20;
 
+/*
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
 	TString diff_hist_name("diff_spectrum_hist");
@@ -120,7 +121,7 @@ int main (int arg_c, char **arg_v)
 	//back_tree->Draw(back_draw_cmd, *beta_cut);
 	
 	diff_hist->Add(back_hist, -1.0);
-
+*/
 
 	{
 		TH1F* time_hist = run->getTimeHistogram(channel);
