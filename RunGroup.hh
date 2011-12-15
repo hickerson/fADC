@@ -25,9 +25,9 @@ struct RunGroup : public Run
 {
 	string 			filename; 				/// name of the run log file
 	vector<Run*> 	runs; 					/// a list of runs as specified in the run log file
-	Spectrum* 		spectra[NUM_CHANNELS];  /// the spectrum of each channel
-	Spectrum 		pmt;					/// ...
+	Spectrum* 		pmt[NUM_CHANNELS];  	/// the spectrum of each channel
 	Spectrum 		Ge;						/// ...
+	Spectrum 		calibrated;				/// ...
 
 	int bin_count;
 	int min_area;

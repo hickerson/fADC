@@ -137,11 +137,14 @@ int main (int arg_c, char **arg_v)
 		TH1F* energy_hist = run->getEnergyHistogram(channel, runGroup.bin_count, 0, runGroup.max_area);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
 		energy_hist->Draw();
+
 		char filename[1024]; 
 		sprintf(filename, "%s.energy.run%d-ch%d.pdf", arg_v[1], run->number, channel);
 		canvas->SaveAs(filename);
 	}
 
+
+/*
 	{
 		TH1F* energy_hist = runGroup.getEnergyHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
@@ -152,6 +155,20 @@ int main (int arg_c, char **arg_v)
 		data_pdf_filename += ".energy.pdf";
 		canvas->SaveAs(data_pdf_filename.c_str());
 	}
+*/
+	{
+		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
+		runGroup.pmt[channel]->foreground = runGroup.getEnergyHistogram(channel);
+		runGroup.pmt[channel]->foreground->GetXaxis()->SetTitle("keV");
+		runGroup.pmt[channel]->foreground->GetYaxis()->SetTitle("rate");
+		runGroup.pmt[channel]->foreground->Draw("G");
+		string data_pdf_filename = arg_v[1];
+		data_pdf_filename += ".energy.pdf";
+		canvas->SaveAs(data_pdf_filename.c_str());
+	}
+
+
+
 	//beta_hist->Draw();
 	//back_hist->Draw("same");
 	//diff_hist->Draw("same");

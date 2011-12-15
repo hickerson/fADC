@@ -49,17 +49,24 @@ struct Spectrum
 {
 	TString name;
 	TString type;
-  	TTree* tree;
+  	//TTree* tree;
 	TH1F* foreground;
 	TH1F* background;
 	TH1F* signal; 
-	bool verbose;
+	//bool verbose;
 
 	Spectrum() {
 		puts("Empty default constructor");
 	}
+
+	Spectrum(TString _name, TString _type) :
+		name(_name),
+		type(_type),
+		foreground(0),
+		background(0),
+		signal(0)
+	{};
 /*
-	Spectrum(TString _filename, TString _hist_name);
 	Spectrum(TString _filename, TString _hist_name, TTree* _tree);
 	Spectrum(TString _filename, TString _hist_name, const Spectrum& _copy);
 
