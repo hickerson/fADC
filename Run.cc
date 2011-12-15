@@ -92,7 +92,7 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 			NanoSeconds this_time = event->peakTime;
 			//NanoSeconds sample_time = this_time - start_time;
 			// TODO NanoSeconds cycle_time = ((sample_time + scan_time - start_time) % scan_time); // seconds
-			double area = event->area;  
+			double area = event->area / 32;  
 			double pulse_height = event->maxSample;  
 			//double charge = area;
 

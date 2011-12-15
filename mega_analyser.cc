@@ -93,9 +93,9 @@ int main (int arg_c, char **arg_v)
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
 
-	runGroup.bin_count = 128;
+	runGroup.bin_count = 140;
 	runGroup.min_area = 0;
-	runGroup.max_area = 40960;
+	runGroup.max_area = 1400;
 	int channel = 20;
 
 /*
@@ -144,8 +144,10 @@ int main (int arg_c, char **arg_v)
 
 	{
 		TH1F* energy_hist = runGroup.getEnergyHistogram(channel);
-		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
-		energy_hist->Draw();
+		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
+		energy_hist->GetXaxis()->SetTitle("keV");
+		energy_hist->GetYaxis()->SetTitle("rate");
+		energy_hist->Draw("G");
 		string data_pdf_filename = arg_v[1];
 		data_pdf_filename += ".energy.pdf";
 		canvas->SaveAs(data_pdf_filename.c_str());

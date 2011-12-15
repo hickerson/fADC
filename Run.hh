@@ -49,7 +49,7 @@ struct Run
 	string type;
 	string date;
 	int number;
-	int run_time;
+	double run_time;
 
 	//Spectrum* spectrum[NUM_CH];
 	TFile* file;

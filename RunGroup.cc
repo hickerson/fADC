@@ -62,7 +62,7 @@ void RunGroup::load()
 		run->date = child.second.get<string>("date");
 		run->number = child.second.get<int>("run");
 		run->type = child.second.get<string>("type");
-		run->run_time = child.second.get<int>("runtime");
+		run->run_time = child.second.get<double>("runtime");
 		run->real_time = 1E9 * run->run_time;
 
 		// Open ntuple
@@ -91,24 +91,25 @@ void RunGroup::load()
 
 TH1F* RunGroup::getEnergyHistogram(int channel) 
 {
+	run_time = 0;
 
-	//if (not spectra[channel]->foreground)
-	//	spectra[channel]->foreground = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
 	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
 
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
 		TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
-		//spectra[channel]->foreground->Add(_hist, 1.0);
 		h->Add(_hist, 1.0);
+		printf("partial run time for run %d is %f\n", (int)i, run_time);
+		run_time += runs[i]->run_time;
 		delete _hist;
 	}
 
 	for (int i = 0; i < bin_count; i++)
-		//spectra[channel]->foreground->SetBinError(i, TMath::Sqrt(spectra[channel]->foreground->GetBinContent(i)));
 		h->SetBinError(i, TMath::Sqrt(h->GetBinContent(i)));
 
+	printf("total run time %f\n", run_time);
+	h->Scale(1/(run_time));
+
 	return h;
-	//return spectra[channel]->foreground;
 }
 
 TH1F* RunGroup::setForegroundHistogram(int channel)
