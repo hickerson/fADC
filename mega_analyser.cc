@@ -133,6 +133,7 @@ int main (int arg_c, char **arg_v)
 		canvas->SaveAs(data_pdf_filename.c_str());
 	}
 
+/*
 	{
 		TH1F* energy_hist = run->getEnergyHistogram(channel, runGroup.bin_count, 0, runGroup.max_area);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
@@ -144,7 +145,6 @@ int main (int arg_c, char **arg_v)
 	}
 
 
-/*
 	{
 		TH1F* energy_hist = runGroup.getEnergyHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
@@ -157,11 +157,18 @@ int main (int arg_c, char **arg_v)
 	}
 */
 	{
+		// create the global canvas
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
-		runGroup.pmt[channel]->foreground = runGroup.getEnergyHistogram(channel);
-		runGroup.pmt[channel]->foreground->GetXaxis()->SetTitle("keV");
-		runGroup.pmt[channel]->foreground->GetYaxis()->SetTitle("rate");
+
+		// select out the foreground runs
+		runGroup.pmt[channel]->foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
 		runGroup.pmt[channel]->foreground->Draw("G");
+
+		// select out the background runs
+		runGroup.pmt[channel]->background = runGroup.getEnergyHistogram(channel, "background");
+		runGroup.pmt[channel]->background->Draw("same");
+
+		// save global canvas to a pdf
 		string data_pdf_filename = arg_v[1];
 		data_pdf_filename += ".energy.pdf";
 		canvas->SaveAs(data_pdf_filename.c_str());

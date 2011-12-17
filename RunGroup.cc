@@ -9,7 +9,7 @@ void RunGroup::init()
 	file = 0;
 	tree = 0;
 	for (int i = 0; i < NUM_CHANNELS; i++)
-		spectra[i] = 0;
+		pmt[i] = 0;
 	sync = 0;
 	start_time = 0;
 	stop_time = 0;
@@ -89,33 +89,44 @@ void RunGroup::load()
 }
 
 
-TH1F* RunGroup::getEnergyHistogram(int channel) 
+
+
+//TH1F* RunGroup::getEnergyHistogram(int channel) 
+TH1F* RunGroup::getEnergyHistogram(int channel, string type) 
 {
 	run_time = 0;
 
 	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
 
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
-		TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
-		h->Add(_hist, 1.0);
-		printf("partial run time for run %d is %f\n", (int)i, run_time);
-		run_time += runs[i]->run_time;
-		delete _hist;
+		if (runs[i]->type == type || type == "") {
+			TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
+			h->Add(_hist, 1.0);
+			printf("partial run time for run %d is %f\n", (int)i, run_time);
+			run_time += runs[i]->run_time;
+			delete _hist;
+		}
 	}
 
 	for (int i = 0; i < bin_count; i++)
 		h->SetBinError(i, TMath::Sqrt(h->GetBinContent(i)));
 
 	printf("total run time %f\n", run_time);
+
 	h->Scale(1/(run_time));
+	h->GetXaxis()->SetTitle("keV");
+	h->GetYaxis()->SetTitle("rate");
 
 	return h;
 }
 
-TH1F* RunGroup::setForegroundHistogram(int channel)
-{
-	if (not spectra[channel]->foreground)
-		spectra[channel]->foreground = getEnergyHistogram(channel);
 
-	return spectra[channel]->foreground;
+
+
+TH1F* RunGroup::setForegroundHistogram(int channel, string type)
+{
+	if (not pmt[channel]->foreground)
+		pmt[channel]->foreground = getEnergyHistogram(channel, type);
+
+	return pmt[channel]->foreground;
 }
