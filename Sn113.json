@@ -1,22 +1,13 @@
 {
 	"data" : [
-		{
-			"date": "Tue Dec 21 00:49:50 UTC 2010", "run": 3822, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 00:59:50 UTC 2010", "run": 3823, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 01:09:50 UTC 2010", "run": 3824, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 01:19:50 UTC 2010", "run": 3825, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 01:29:50 UTC 2010", "run": 3826, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 01:39:50 UTC 2010", "run": 3827, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 01:49:50 UTC 2010", "run": 3828, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 01:59:50 UTC 2010", "run": 3829, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
-		{
-			"date": "Tue Dec 21 18:10:51 UTC 2010", "run": 3831, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" }
+		{ "date": "Tue Dec 21 00:49:50 UTC 2010", "run": 3822, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 00:59:50 UTC 2010", "run": 3823, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 01:09:50 UTC 2010", "run": 3824, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 01:19:50 UTC 2010", "run": 3825, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 01:29:50 UTC 2010", "run": 3826, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 01:39:50 UTC 2010", "run": 3827, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 01:49:50 UTC 2010", "run": 3828, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 01:59:50 UTC 2010", "run": 3829, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{ "date": "Tue Dec 21 18:10:51 UTC 2010", "run": 3831, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" }
 	]
 }

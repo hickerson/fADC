@@ -2,21 +2,28 @@
 #define FULLENERGYEVENT_HH
 
 #include "TROOT.h"
+#include "NGammaEvent.h"
+#include <vector>
 
-#define MAX_CHANNELS_PER_EVENT 8;
-#define ENERGY_CALIBRATION_DEGREE 3;
+#define MAX_CHANNELS_PER_EVENT 8
+#define ENERGY_CALIBRATION_DEGREE 3
 
-class FullEnergyEvent
+typedef double keV;
+typedef Long64_t NanoSeconds;
+
+struct FullEnergyEvent
 {
-public:
-	int events;											//< the number of channel events that make this event
-	NGammaEvent events[MAX_CHANNELS_PER_EVENT];         
+	int numEvents;											//< the number of channel events that make this event
+	NGammaEvent* events[MAX_CHANNELS_PER_EVENT];         	//< array of events using a runs map
 	//double gmsCoefficients[MAX_CHANNELS_PER_EVENT][ENERGY_CALIBRATION_DEGREE];
-	//double visibleEnergy;
-	double trueEnergy;
+	keV visibleEnergy;
+	keV trueEnergy;
 	Long64_t firstEventNum;
-	Long64_t visibleTriggerTime;
-	Long64_t calibratedTriggerTime;
+	NanoSeconds triggerTime;
+	NanoSeconds avgTime;
+	//NanoSeconds calibratedTriggerTime;
+
+	bool addNearEvent(const NGammaEvent &, NanoSeconds windowTime);
 };
 
 

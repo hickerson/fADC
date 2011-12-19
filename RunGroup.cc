@@ -102,8 +102,8 @@ TH1F* RunGroup::getEnergyHistogram(int channel, string type)
 		if (runs[i]->type == type || type == "") {
 			TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
 			h->Add(_hist, 1.0);
-			printf("partial run time for run %d is %f\n", (int)i, run_time);
 			run_time += runs[i]->run_time;
+			printf("Partial run time for run %d is %f\n", (int)i, run_time);
 			delete _hist;
 		}
 	}

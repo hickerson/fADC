@@ -29,6 +29,7 @@
 
 // UCNb INCLUDES
 #include "NGammaEvent.h"
+#include "FullEnergyEvent.hh"
 
 using namespace std;
 typedef Long64_t NanoSeconds;
@@ -56,6 +57,7 @@ struct Run
 	TTree* tree;
 	TH1F* histogram[NUM_CHANNELS];
 	TH1F* sync;
+	vector <FullEnergyEvent> energyEvents;
 
 	NanoSeconds real_time;
 	NanoSeconds start_time;

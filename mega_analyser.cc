@@ -86,9 +86,9 @@ int main (int arg_c, char **arg_v)
 	RunGroup runGroup(json_filename);
 	runGroup.load();
 	
-	Run* run = runGroup.runs[0];
+	//Run* run = runGroup.runs[0];
 	
-    // Plot options
+    // global plot options
   	gStyle->SetOptStat(0);
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
@@ -124,6 +124,7 @@ int main (int arg_c, char **arg_v)
 	diff_hist->Add(back_hist, -1.0);
 */
 
+/*
 	{
 		TH1F* time_hist = run->getTimeHistogram(channel);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
@@ -133,7 +134,6 @@ int main (int arg_c, char **arg_v)
 		canvas->SaveAs(data_pdf_filename.c_str());
 	}
 
-/*
 	{
 		TH1F* energy_hist = run->getEnergyHistogram(channel, runGroup.bin_count, 0, runGroup.max_area);
 		TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
@@ -156,6 +156,8 @@ int main (int arg_c, char **arg_v)
 		canvas->SaveAs(data_pdf_filename.c_str());
 	}
 */
+
+
 	{
 		// create the global canvas
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
@@ -171,7 +173,8 @@ int main (int arg_c, char **arg_v)
 		// save global canvas to a pdf
 		string data_pdf_filename = arg_v[1];
 		data_pdf_filename += ".energy.pdf";
-		canvas->SaveAs(data_pdf_filename.c_str());
+		//canvas->SaveAs(data_pdf_filename.c_str());
+		canvas->Print(data_pdf_filename.c_str());
 	}
 
 

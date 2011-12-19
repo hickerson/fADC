@@ -127,4 +127,5 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int max) 
 {
 	puts("tbd...");
+	return 0;
 }
