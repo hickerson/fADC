@@ -1,0 +1,6 @@
+{
+	"data" : [
+		{
+			"date": "Tue Dec 21 00:49:50 UTC 2010", "run": 3822, "runtime": 600, "sleep": 0, "type": "Sn113", "GeHV": 0, "gas": "vacuum", "HV": 1.24, "LED": "fixed" }
+	]
+}

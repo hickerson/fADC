@@ -101,6 +101,7 @@ public:
 	TH1F* getTimeHistogram(int channel);
 	TH1F* getEnergyHistogram(int channel, int bin_count, int min, int max);
 	TH1F* getEnergyHistogram(vector<int> channels, int bin_count, int min, int max);
+	void findFullEnergyEvents(NanoSeconds windowTime);
 };
 
 #endif
