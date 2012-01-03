@@ -60,11 +60,11 @@ public:
 	~RunGroup()
 	{
 		puts("Empty destructor for RunGroup");
-		abort();
 	}
 	
 	RunGroup & operator = (const RunGroup & other)
     {
+		abort();
         if (this != &other) // protect against invalid self-assignment
         {
 			runs = other.runs;

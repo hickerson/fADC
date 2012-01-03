@@ -166,7 +166,9 @@ int main (int arg_c, char **arg_v)
 		// select out the foreground runs
 		cout << arg_v[1] << endl;
 		runGroup.spectrum["fule_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
-		//runGroup.spectrum["full_energy"].foreground->Draw("G");
+		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
+		TH1F* h = runGroup.spectrum["fule_energy"].foreground;
+		h->Draw("G");
 
 		// select out the background runs
 		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channel, "background");

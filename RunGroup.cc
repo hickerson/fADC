@@ -100,6 +100,7 @@ TH1F* RunGroup::getEnergyHistogram(int channel, string type)
 
 	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
 
+	cout << "number of runs " << runs.size() << endl;
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
 		if (runs[i]->type == type || type == "") {
 			TH1F* _hist = runs[i]->getEnergyHistogram(channel, bin_count, min_area, max_area);
@@ -108,6 +109,8 @@ TH1F* RunGroup::getEnergyHistogram(int channel, string type)
 			printf("Partial run time for run %d is %f\n", (int)i, run_time);
 			delete _hist;
 		}
+		else
+			cout << "Skipped run "<<i<<" because type "<<runs[i]->type<<" did not match type "<<type<<endl; 
 	}
 
 	for (int i = 0; i < bin_count; i++)
