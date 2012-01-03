@@ -21,6 +21,7 @@
 
 // STL INCLUDES
 #include <vector>
+#include <map>
 
 // INCLUDES
 #include "RunGroup.hh"
@@ -163,12 +164,13 @@ int main (int arg_c, char **arg_v)
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
 
 		// select out the foreground runs
-		runGroup.pmt[channel]->foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
-		runGroup.pmt[channel]->foreground->Draw("G");
+		cout << arg_v[1] << endl;
+		runGroup.spectrum["fule_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
+		//runGroup.spectrum["full_energy"].foreground->Draw("G");
 
 		// select out the background runs
-		runGroup.pmt[channel]->background = runGroup.getEnergyHistogram(channel, "background");
-		runGroup.pmt[channel]->background->Draw("same");
+		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channel, "background");
+		//runGroup.spectrum["full_energy"].background->Draw("same");
 
 		// save global canvas to a pdf
 		string data_pdf_filename = arg_v[1];

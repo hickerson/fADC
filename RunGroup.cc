@@ -8,8 +8,10 @@ void RunGroup::init()
 	date = "";
 	file = 0;
 	tree = 0;
-	for (int i = 0; i < NUM_CHANNELS; i++)
-		pmt[i] = 0;
+
+	//for (int i = 0; i < NUM_CHANNELS; i++)
+	//	pmt[i] = 0;
+
 	sync = 0;
 	start_time = 0;
 	stop_time = 0;
@@ -122,7 +124,7 @@ TH1F* RunGroup::getEnergyHistogram(int channel, string type)
 
 
 
-
+/*
 TH1F* RunGroup::setForegroundHistogram(int channel, string type)
 {
 	if (not pmt[channel]->foreground)
@@ -130,3 +132,4 @@ TH1F* RunGroup::setForegroundHistogram(int channel, string type)
 
 	return pmt[channel]->foreground;
 }
+*/

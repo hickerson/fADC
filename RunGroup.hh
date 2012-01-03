@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "Run.hh"
 #include "Spectrum.hh"
@@ -23,11 +24,13 @@ using namespace std;
  */
 struct RunGroup : public Run
 {
-	string 			filename; 				/// name of the run log file
-	vector<Run*> 	runs; 					/// a list of runs as specified in the run log file
-	Spectrum* 		pmt[NUM_CHANNELS];  	/// the spectrum of each channel
-	Spectrum 		Ge;						/// ...
-	Spectrum 		calibrated;				/// ...
+	string 					filename; 		/// name of the run log file
+	vector <Run*> 			runs; 			/// a list of runs as specified in the run log file
+	//Spectrum* 		pmt[NUM_CHANNELS];  /// the spectrum of each channel
+	//Spectrum 				Ge;			 	/// ...
+	//Spectrum 				calibrated;		/// ...
+	map <string, Spectrum>	spectrum;
+	map <string, int>   	channel;
 
 	int bin_count;
 	int min_area;
@@ -51,11 +54,13 @@ public:
 	RunGroup(const RunGroup & copy)
 	{
 		puts("Empty copy constructor for RunGroup");
+		abort();
 	}
 
 	~RunGroup()
 	{
 		puts("Empty destructor for RunGroup");
+		abort();
 	}
 	
 	RunGroup & operator = (const RunGroup & other)
@@ -81,7 +86,7 @@ public:
 	TH1F* getEnergyHistogram(int channel, string type);
 
 	//TH1F* setForegroundHistogram(int channel);
-	TH1F* setForegroundHistogram(int channel, string type);
+	//TH1F* setForegroundHistogram(int channel, string type);
 };
 
 #endif
