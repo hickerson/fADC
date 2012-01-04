@@ -124,17 +124,22 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 }
 
 
+
 TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int max) 
 {
-	puts("tbd...");
+	//puts("tbd...");
+	//abort();
+	findFullEnergyEvents(1000);
 	return 0;
 }
 
+
+
 void Run::findFullEnergyEvents(NanoSeconds windowTime) 
 {
-	int64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
     tree->SetBranchAddress("evt", &event);
+	int64_t event_num = 0;
 	
 	int N = tree->GetEntries();
 	tree->GetEntry(0);
@@ -142,12 +147,24 @@ void Run::findFullEnergyEvents(NanoSeconds windowTime)
 	//NanoSeconds last_time = first_time;
 	start_time = event->peakTime;
 	stop_time = start_time;
+	NanoSeconds last_time = start_time;
 
 	for (int i = 0; i < N; i++)
 	{
 		if (tree->GetEntry(i) > 0)
 		{
 			NanoSeconds this_time = event->peakTime;
+			if (TMath::Abs(this_time - last_time) < windowTime)
+				; // ...
+			else
+			{
+				event_num++;
+				last_time = this_time;
+			}
+
+			cout << "Event "<< event_num 
+				 <<" channel " << event->channel
+				 <<" event time " << this_time << endl;
 		}
 	}
 }

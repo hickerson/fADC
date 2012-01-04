@@ -97,7 +97,7 @@ int main (int arg_c, char **arg_v)
 	runGroup.bin_count = 140;
 	runGroup.min_area = 0;
 	runGroup.max_area = 1400;
-	int channel = 20;
+	int channel = 24;
 
 /*
 	TString beta_hist_name("beta_spectrum_hist");
@@ -162,12 +162,17 @@ int main (int arg_c, char **arg_v)
 	{
 		// create the global canvas
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
+		vector<int> channels;
+		channels.push_back(20);
+		channels.push_back(21);
+		channels.push_back(23);
 
 		// select out the foreground runs
 		cout << arg_v[1] << endl;
-		runGroup.spectrum["fule_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
+		//runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
+		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, arg_v[1]);
 		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
-		TH1F* h = runGroup.spectrum["fule_energy"].foreground;
+		TH1F* h = runGroup.spectrum["full_energy"].foreground;
 		h->Draw("G");
 
 		// select out the background runs
@@ -175,10 +180,12 @@ int main (int arg_c, char **arg_v)
 		//runGroup.spectrum["full_energy"].background->Draw("same");
 
 		// save global canvas to a pdf
-		string data_pdf_filename = arg_v[1];
-		data_pdf_filename += ".energy.pdf";
-		//canvas->SaveAs(data_pdf_filename.c_str());
-		canvas->Print(data_pdf_filename.c_str());
+	//	string data_pdf_filename = arg_v[1];
+	//	data_pdf_filename += ".energy.pdf";
+	//	canvas->Print(data_pdf_filename.c_str());
+		char filename[1024];
+		sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
+		canvas->Print(filename);
 	}
 
 

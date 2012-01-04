@@ -2,19 +2,25 @@
 #define FULLENERGYEVENT_HH
 
 #include "TROOT.h"
+
 #include "NGammaEvent.h"
+
 #include <vector>
+#include <map>
 
 #define MAX_CHANNELS_PER_EVENT 8
 #define ENERGY_CALIBRATION_DEGREE 3
+
+using namespace std;
 
 typedef double keV;
 typedef Long64_t NanoSeconds;
 
 struct FullEnergyEvent
 {
-	int numEvents;											//< the number of channel events that make this event
-	NGammaEvent* events[MAX_CHANNELS_PER_EVENT];         	//< array of events using a runs map
+	int numEvents;						//< the number of channel events that make this event
+	//NGammaEvent* events[MAX_CHANNELS_PER_EVENT]; //< array of events using a runs map
+	map <int, NGammaEvent>  events;		//<  map of events using channel as a key
 	//double gmsCoefficients[MAX_CHANNELS_PER_EVENT][ENERGY_CALIBRATION_DEGREE];
 	keV visibleEnergy;
 	keV trueEnergy;

@@ -84,6 +84,7 @@ public:
 
 	//TH1F* getEnergyHistogram(int channel);
 	TH1F* getEnergyHistogram(int channel, string type);
+	TH1F* getEnergyHistogram(vector<int> channels, string type);
 
 	//TH1F* setForegroundHistogram(int channel);
 	//TH1F* setForegroundHistogram(int channel, string type);
