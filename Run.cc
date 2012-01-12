@@ -87,6 +87,9 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 
 	for (int i = 0; i < N; i++)
 	{
+		event = new NGammaEvent();
+    	tree->SetBranchAddress("evt", &event);
+
 		if (tree->GetEntry(i) > 0)
 		{
 			NanoSeconds this_time = event->peakTime;
@@ -179,6 +182,8 @@ void Run::findFullEnergyEvents(NanoSeconds windowTime)
 
 	for (int i = 0; i < N; i++)
 	{
+		event = new NGammaEvent();
+    	tree->SetBranchAddress("evt", &event);
 		if (tree->GetEntry(i) > 0)
 		{
 			NanoSeconds this_time = event->peakTime;
