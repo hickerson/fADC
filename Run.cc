@@ -120,7 +120,6 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 */
 	cout << "Number of entries filled is " << num << "." << endl;
 	return hist;
-	
 }
 
 
@@ -129,8 +128,36 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 {
 	//puts("tbd...");
 	//abort();
-	findFullEnergyEvents(1000);
-	return 0;
+	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), min, max);
+	
+	int64_t num = 0;
+	findFullEnergyEvents(10);
+	for (unsigned i = 0; i < energyEvents.size(); i++)
+	{
+		double area_sum = 0;
+		FullEnergyEvent* full_event = energyEvents[i];
+		full_event->maxSample = 0;
+		for (unsigned j = 0; j < channels.size(); j++)
+		{
+			int channel = channels[j];
+			if (full_event->events.find(channel) != full_event->events.end())
+			{
+				NGammaEvent* event = full_event->events[channel];
+				area_sum += event->area; // do stuff...
+				cout << event->area << "(" << event->channel << ", " << channel << ") + ";
+				if (event->maxSample > full_event->maxSample);
+					full_event->maxSample = event->maxSample;  
+			}
+		}
+				
+		if (full_event->maxSample < 4096 and area_sum > 0) {
+			cout << " = " << area_sum << endl;
+			hist->Fill(area_sum);
+			num++;
+		}
+	}
+
+	return hist;
 }
 
 
@@ -148,23 +175,32 @@ void Run::findFullEnergyEvents(NanoSeconds windowTime)
 	start_time = event->peakTime;
 	stop_time = start_time;
 	NanoSeconds last_time = start_time;
+	FullEnergyEvent* full_event = new FullEnergyEvent();
 
 	for (int i = 0; i < N; i++)
 	{
 		if (tree->GetEntry(i) > 0)
 		{
 			NanoSeconds this_time = event->peakTime;
+			full_event->events[event->channel] = event; // TODO replace with method
+
 			if (TMath::Abs(this_time - last_time) < windowTime)
-				; // ...
+			{
+				//cout << event->area << endl;
+			}
 			else
 			{
 				event_num++;
 				last_time = this_time;
+				energyEvents.push_back(full_event);
+				full_event = new FullEnergyEvent();
 			}
 
+			/*
 			cout << "Event "<< event_num 
 				 <<" channel " << event->channel
 				 <<" event time " << this_time << endl;
+				 */
 		}
 	}
 }

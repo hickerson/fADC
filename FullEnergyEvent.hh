@@ -20,13 +20,14 @@ struct FullEnergyEvent
 {
 	int numEvents;						//< the number of channel events that make this event
 	//NGammaEvent* events[MAX_CHANNELS_PER_EVENT]; //< array of events using a runs map
-	map <int, NGammaEvent>  events;		//<  map of events using channel as a key
+	map <int, NGammaEvent*>  events;		//<  map of events using channel as a key
 	//double gmsCoefficients[MAX_CHANNELS_PER_EVENT][ENERGY_CALIBRATION_DEGREE];
 	keV visibleEnergy;
 	keV trueEnergy;
 	Long64_t firstEventNum;
 	NanoSeconds triggerTime;
 	NanoSeconds avgTime;
+	int maxSample;
 	//NanoSeconds calibratedTriggerTime;
 
 	bool addNearEvent(const NGammaEvent &, NanoSeconds windowTime);

@@ -12,7 +12,7 @@ void RunGroup::init()
 	//for (int i = 0; i < NUM_CHANNELS; i++)
 	//	pmt[i] = 0;
 
-	sync = 0;
+	//sync = 0;
 	start_time = 0;
 	stop_time = 0;
 	cycle_start_time = 0;

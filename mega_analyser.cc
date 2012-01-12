@@ -96,7 +96,7 @@ int main (int arg_c, char **arg_v)
 
 	runGroup.bin_count = 140;
 	runGroup.min_area = 0;
-	runGroup.max_area = 1400;
+	runGroup.max_area = 140000;
 	int channel = 24;
 
 /*
@@ -184,7 +184,8 @@ int main (int arg_c, char **arg_v)
 	//	data_pdf_filename += ".energy.pdf";
 	//	canvas->Print(data_pdf_filename.c_str());
 		char filename[1024];
-		sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
+		//sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
+		sprintf(filename, "%s.full-energy.pdf", arg_v[1]);
 		canvas->Print(filename);
 	}
 

@@ -55,9 +55,10 @@ struct Run
 	//Spectrum* spectrum[NUM_CH];
 	TFile* file;
 	TTree* tree;
-	TH1F* histogram[NUM_CHANNELS];
-	TH1F* sync;
-	vector <FullEnergyEvent> energyEvents;
+	//TH1F* histogram[NUM_CHANNELS];
+	map <int, TH1F*> histogram;
+	//TH1F* sync;
+	vector <FullEnergyEvent*> energyEvents;
 
 	NanoSeconds real_time;
 	NanoSeconds start_time;
