@@ -44,82 +44,67 @@ class Spectrum
  *
  */
 
-struct PeriodicPattern
-{
-	Long64_t start_time;
-	Long64_t stop_time;
-	Long64_t scan_time;
-	Long64_t max_time;
-};
-
-struct PeriodicSpectrum 
-{
-	TString filename;
-	TString hist_name;
-	PeriodicPattern pattern;
-	double multiplier;
-
-  	TFile* file;
-  	TTree* tree;
-	TH1F* trigger_hist; 
-	TH1F* time_hist; 
-	TH1F* area_hist;
-	TH2F* area_time_hist;
-
-public:
-	//PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier);
-	PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, double _multiplier);
-	int MakeHistogram();
-	int LoadFile();
-	PeriodicPattern GetTriggerPattern();
-};
-
-bool verbose;
-
+Long64_t scan_time;
+Long64_t max_time;
 TString filename;
-
-PeriodicPattern foreground_pattern;
-PeriodicPattern background_pattern;
-//Long64_t scan_time;
-//Long64_t max_time;
-//Long64_t start_time;
-//Long64_t background_start_time;
+Long64_t background_start_time;
+Long64_t start_time;
 
 int time_bin_count;
 int area_bin_count;
-float time_fine_ratio;
-float area_fine_ratio;
+int time_fine_ratio;
+int area_fine_ratio;
 
 double max_area;
 double lower_area_cut;
 double upper_area_cut;
-Long64_t lower_time_cut;
-Long64_t upper_time_cut;
+double lower_time_cut;
+double upper_time_cut;
 
 float lifetime1_start_time;
 float lifetime1_stop_time;
 float lifetime2_start_time;
 float lifetime2_stop_time;
 
+struct PeriodicSpectrum 
+{
+	TString filename;
+	TString hist_name;
+	Long64_t start_time;
+	Long64_t scan_time;
+	Long64_t max_time;
+	double multiplier;
+
+  	TFile* file;
+  	TTree* tree;
+	TH1F* time_hist; 
+	TH1F* area_hist;
+	TH2F* area_time_hist;
+
+public:
+	PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier);
+	int MakeHistogram();
+};
+
+bool verbose;
+
 void usage(const char * arg_name) 
 {
-	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)] [background start time(s)]\n", arg_name);
+	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)]\n", arg_name);
 }
 
+Long64_t trigger(TTree* tree) {
+	
+}
 
-//PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t stop_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier)
-PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, PeriodicPattern _pattern, double _multiplier)
+PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, Long64_t _start_time, Long64_t _scan_time, Long64_t _max_time, double _multiplier)
 {
 	filename = _filename;
 	hist_name = _hist_name;
-
-	pattern = _pattern;
-	//start_time = _start_time;
-	//stop_time = _stop_time;
-	//scan_time = _scan_time;
-	//max_time = _max_time;
+	start_time = _start_time;
+	scan_time = _scan_time;
+	max_time = _max_time;
 	multiplier = _multiplier;
-
   	file = 0;
   	tree = 0;
 	time_hist = 0; 
@@ -127,13 +112,7 @@ PeriodicSpectrum::PeriodicSpectrum(TString _filename, TString _hist_name, Period
 	area_time_hist = 0;
 }
 
-PeriodicPattern PeriodicSpectrum::GetTriggerPattern()
-{
-	
-}
-
-
-int PeriodicSpectrum::LoadFile()
+int PeriodicSpectrum::MakeHistogram()
 {
   	file = new TFile(filename);
   	if (file->IsZombie())
@@ -155,14 +134,11 @@ int PeriodicSpectrum::LoadFile()
 		else
   			printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
 	}
-}
 
-int PeriodicSpectrum::MakeHistogram()
-{
 	area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
-				   time_bin_count, 0, pattern.scan_time/1E9, area_bin_count, 0, max_area);
-	time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", int(time_fine_ratio*time_bin_count), 0, pattern.scan_time/1E9);
-	area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", int(area_fine_ratio*area_bin_count), 0, max_area);
+				   time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
+	time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", time_fine_ratio*time_bin_count, 0, scan_time/1E9);
+	area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", area_fine_ratio*area_bin_count, 0, max_area);
 	
 	Long64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
@@ -177,11 +153,9 @@ int PeriodicSpectrum::MakeHistogram()
 		if (tree->GetEntry(i) > 0)
 		{
 			Long64_t sample_time = event->peakTime - first_time;
-			if (event->channel == 21 && sample_time < pattern.max_time)
+			if (event->channel == 22 && sample_time < max_time)
 			{
-				//double cycle_time = ((sample_time + scan_time - start_time) % scan_time) / 1E9; // seconds
-				//double cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time) / 1E9; // seconds
-				Long64_t cycle_time = ((sample_time + pattern.scan_time - pattern.start_time) % pattern.scan_time); // seconds
+				double cycle_time = ((sample_time + scan_time - start_time) % scan_time) / 1E9; // seconds
 				double area = event->area;  
 				double pulse_height = event->maxSample;  
 				double charge = area;
@@ -190,9 +164,9 @@ int PeriodicSpectrum::MakeHistogram()
 					area_time_hist->Fill(cycle_time, charge);
 
 					if (charge > lower_area_cut && charge < upper_area_cut)
-						time_hist->Fill(double(cycle_time/1E9));
+						time_hist->Fill(cycle_time);
 
-					if (cycle_time > lower_time_cut && cycle_time < upper_time_cut)
+					if (cycle_time > lower_time_cut && cycle_time < upper_area_cut)
 						area_hist->Fill(charge);
 
 					num++;
@@ -207,7 +181,6 @@ int PeriodicSpectrum::MakeHistogram()
 	return num;
 }
 
-/*
 int MakeHistogram(TString filename, TString hist_name, TH2F** area_time_hist, TH1F** time_hist, TH1F** area_hist)
 {
   	TFile* file = new TFile(filename);
@@ -276,33 +249,11 @@ int MakeHistogram(TString filename, TString hist_name, TH2F** area_time_hist, TH
 	cout << "Number of entries filled is " << num << "." << endl;
 	return num;
 }
-*/
 
 int main (int arg_c, char **arg_v)
 {
  	TApplication app("PMT Spectrum Analysis", &arg_c, arg_v);
 	vector<PeriodicSpectrum*> spectra;
-
-	foreground_pattern.start_time = Long64_t(0);       // ns
-	foreground_pattern.scan_time = Long64_t(5.2E9); 	// ns
-	foreground_pattern.max_time = Long64_t(520E9); 	// ns
-
-	time_bin_count = 52;
-	area_bin_count = 100;		
-	time_fine_ratio = 1;
-	area_fine_ratio = 4;
-
-	//max_area = 4096;
-	max_area = 4096*16;              // in multiples 78 fC
-	lower_area_cut = 0;
-	upper_area_cut = max_area;
-	lower_time_cut = foreground_pattern.scan_time * 0.1;
-	upper_time_cut = foreground_pattern.scan_time * 0.9;
-
-	lifetime1_start_time = 156;
-	lifetime1_stop_time = 300;
-	//lifetime2_start_time = 100;
-	//lifetime2_stop_time = 200;
 
   	if (arg_c < 3)
   	{
@@ -310,56 +261,64 @@ int main (int arg_c, char **arg_v)
 		exit(1);
   	}
 
-  	int foreground_run = atoi(arg_v[1]);
-  	if (foreground_run == 0)
+  	int fore_run = atoi(arg_v[1]);
+  	if (fore_run == 0)
   	{
 		printf("Need a valid beta run number.\n");
 		usage(arg_v[0]);
 		exit(1);
   	}
 
-	int background_run = atoi(arg_v[2]);
+/*
+  	int background_run = atoi(arg_v[2]);
   	if (background_run == 0)
   	{
-		printf("no background run number found.\n");
-		//printf("Need a valid background run number.\n");
-		//usage(arg_v[0]);
-		//exit(1);
+		printf("Need a valid background run number.\n");
+		usage(arg_v[0]);
+		exit(1);
   	}
-	if (background_run == foreground_run)
-	{
-		printf("Using same run as background");
-		background_run = 0;
-	}
-	
+*/
+	scan_time = Long64_t(5.2E9); 	// ns
+	start_time = Long64_t(0);       // ns
+	max_time = Long64_t(520E9); 	// ns
+	background_start_time = Long64_t(0); 	// ns
+
+	time_bin_count = 78*10;
+	area_bin_count = 100;		
+	time_fine_ratio = 2;
+	area_fine_ratio = 2;
+
+	//max_area = 4096;
+	max_area = 4096*8;              // in multiples 78 fC
+	lower_area_cut = 0;
+	upper_area_cut = max_area;
+	lower_time_cut = 1;
+	upper_time_cut = 38;
+
+	lifetime1_start_time = 2.5;
+	lifetime1_stop_time = 5.5;
+	lifetime2_start_time = 40;
+	lifetime2_stop_time = 77;
+
+
   	if (arg_c > 3) 
   	{
-		foreground_pattern.start_time = Long64_t(atof(arg_v[3]) * 1E9);
+		start_time = Long64_t(atof(arg_v[3]) * 1E9);
 	}
-	background_pattern.start_time = foreground_pattern.start_time;
 
   	if (arg_c > 4) 
   	{
-		foreground_pattern.scan_time = Long64_t(atof(arg_v[4]) * 1E9);
-		time_bin_count = int(atof(arg_v[4])*10);
-		printf("time bin count %d\n", time_bin_count);
+		scan_time = Long64_t(atof(arg_v[4]) * 1E9);
 	}
-	background_pattern.scan_time = foreground_pattern.scan_time;
 	
   	if (arg_c > 5) 
   	{
-		foreground_pattern.max_time = Long64_t(atof(arg_v[5]) * 1E9);
-		time_fine_ratio = atof(arg_v[5]) / time_bin_count;
-		printf("time bin count multiplier %f\n", time_fine_ratio);
+		max_time = Long64_t(atof(arg_v[5]) * 1E9);
 	}
-	background_pattern.max_time = foreground_pattern.max_time;
 
-	if (background_run)
-	{
-  		if (arg_c > 6) 
-  		{
-			background_pattern.start_time = Long64_t(atof(arg_v[6]) * 1E9);
-		}
+  	if (arg_c > 6) 
+  	{
+		background_start_time = Long64_t(atof(arg_v[6]) * 1E9);
 	}
 
 	for (int i = 3; i < arg_c; i++)
@@ -369,33 +328,17 @@ int main (int arg_c, char **arg_v)
 
   	// Construct run filename
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	TString foreground_filename(root_data_dir + "/run" + TString(arg_v[1]) + ".root");
-	TString background_filename(root_data_dir + "/run" + TString(arg_v[2]) + ".root");
+	TString fore_filename(root_data_dir + "/run" + TString(arg_v[1]) + ".root");
+	//TString fore_filename(root_data_dir + arg_v[1]);
+	TString back_filename(root_data_dir + "/run" + TString(arg_v[2]) + ".root");
+	//TString back_filename(root_data_dir + arg_v[2]);
 
 	// new way...
-	PeriodicSpectrum* foreground = 0;
-	PeriodicSpectrum* background = 0;
+	PeriodicSpectrum* foreground = new PeriodicSpectrum(fore_filename, "beta", start_time, scan_time, max_time, +1);
+	//PeriodicSpectrum* background = new PeriodicSpectrum(back_filename, "back", background_start_time, scan_time, max_time, -1);
 
-	//foreground = new PeriodicSpectrum(fore_filename, "foreground", start_time, scan_time, max_time, +1);
-	foreground = new PeriodicSpectrum(foreground_filename, "foreground", foreground_pattern, +1);
-	if (foreground)
-	{
-		foreground->LoadFile();
-		foreground->GetTriggerPattern();
-		foreground->MakeHistogram();
-	}
-
-	if (background_run)
-	{
-		//background = new PeriodicSpectrum(back_filename, "background", background_start_time, scan_time, max_time, -1/10);
-		background = new PeriodicSpectrum(background_filename, "background", background_pattern, -1);
-		if (background)
-		{
-			background->LoadFile();
-			background->GetTriggerPattern();
-			background->MakeHistogram();
-		}
-	}
+	foreground->MakeHistogram();
+	//background->MakeHistogram();
 
 /*
   	// Open beta ntuple
@@ -405,14 +348,13 @@ int main (int arg_c, char **arg_v)
 	TH2F* back_area_time_hist;
 	TH1F* back_time_hist;
 	TH1F* back_area_hist;
-*/	
 	TH2F* diff_area_time_hist;
 	TH1F* diff_time_hist;
 	TH1F* diff_area_hist;
-
-	diff_area_time_hist = new TH2F(*(foreground->area_time_hist));
-	diff_time_hist = new TH1F(*(foreground->time_hist));
-	diff_area_hist = new TH1F(*(foreground->area_hist));
+*/	
+	TH2F* diff_area_time_hist = new TH2F(*(foreground->area_time_hist));
+	TH1F* diff_time_hist = new TH1F(*(foreground->time_hist));
+	TH1F* diff_area_hist = new TH1F(*(foreground->area_hist));
 
 	// Create and fill ntuples
 /*
@@ -424,25 +366,24 @@ int main (int arg_c, char **arg_v)
 	MakeHistogram(back_filename, "back", &back_area_time_hist, &back_time_hist, &back_area_hist);
 */
 	// Do background subtraction
-	if (background)
-	{
-		diff_area_time_hist->Add(background->area_time_hist, background->multiplier);
-		diff_time_hist->Add(background->time_hist, background->multiplier);
-		diff_area_hist->Add(background->area_hist, background->multiplier);
-	}
+//	diff_area_time_hist->Add(background->area_time_hist, background->multiplier);
+//	diff_time_hist->Add(background->time_hist, background->multiplier);
+//	diff_area_hist->Add(background->area_hist, background->multiplier);
 
 	// Fit lifetimes to time plot
-	TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])", lifetime1_start_time, lifetime1_stop_time);
+	//TF1 *lifetime1_fit = new TF1("lifetime1_fit", "[0]*exp(-x/[1])+30", lifetime1_start_time, lifetime1_stop_time);
 	TF1 *lifetime2_fit = new TF1("lifetime2_fit", "[0]*exp(-x/[1])", lifetime2_start_time, lifetime2_stop_time);
 
-
+/*
 	lifetime1_fit->SetParameter(0,160);
 	lifetime1_fit->SetParameter(1,3);
-
+*/
 	lifetime2_fit->SetParameter(0,20);
 	lifetime2_fit->SetParameter(1,4);
 
+/*
 	diff_time_hist->Fit(lifetime1_fit, "R");
+*/
 	diff_time_hist->Fit(lifetime2_fit, "+R");
 
   	// Plot options
@@ -458,17 +399,12 @@ int main (int arg_c, char **arg_v)
 	// Draw 1D time histogram 
 	TCanvas* time_canvas1D = new TCanvas("time_hist_canvas", "Time sequence", 1920/2, 1080/2);
 	foreground->time_hist->SetLineColor(2);
+	//background->time_hist->SetLineColor(4);
+	diff_time_hist->SetLineColor(1);
 	//foreground->time_hist->SetAxisRange(0,1000,"Y");
 	foreground->time_hist->Draw("");
-
-	if (background)
-	{
-		background->time_hist->SetLineColor(4);
-		diff_time_hist->SetLineColor(1);
-		background->time_hist->Draw("same");
-		diff_time_hist->Draw("same");
-	}
-
+	//background->time_hist->Draw("same");
+	diff_time_hist->Draw("same");
 	TLatex latex;
 	latex.DrawLatex(200,200, "#tau = ");
 /*
@@ -495,26 +431,21 @@ int main (int arg_c, char **arg_v)
 	// Draw 1D area histogram
 	TCanvas* area_canvas1D = new TCanvas("area_hist_canvas", "Visible energy spectrum", 1920/2, 1080/2);
 	foreground->area_hist->SetLineColor(2);
+	//background->area_hist->SetLineColor(4);
+	diff_area_hist->SetLineColor(1);
 	foreground->area_hist->Draw("");
-	if (background)
-	{
-		background->area_hist->SetLineColor(4);
-		diff_area_hist->SetLineColor(1);
-		background->area_hist->Draw("same");
-		diff_area_hist->Draw("same");
-	}
+	//background->area_hist->Draw("same");
+	diff_area_hist->Draw("same");
 
-	int cycles = foreground_pattern.max_time / foreground_pattern.scan_time;
-	Long64_t time_window = upper_time_cut - lower_time_cut;
-	Long64_t live_time = time_window * cycles;
+	double time_window = upper_time_cut - lower_time_cut;
+	double live_time = time_window * max_time / scan_time;
 	double back_counts = diff_area_hist->Integral();
 	double fore_counts = diff_area_hist->Integral();
 	double diff_counts = diff_area_hist->Integral();
-	cout << "Number of cycles is " << cycles << endl;
-	cout << "Time window is " << time_window / 1E9 << " sec" << endl;
-	cout << "live time is " << live_time / 1E9 << " sec" << endl;
-	cout << "Differance count is " << diff_counts << endl;
-	cout << "Difference rate is " << 1E9 * diff_counts / live_time << " Hz" << endl;
+	cout << "diff counts: " << diff_counts << endl;
+	cout << "time window: " << time_window << " sec" << endl;
+	cout << "live time: " << live_time << " sec" << endl;
+	cout << "diff rate " << diff_counts / live_time << " Hz" << endl;
 
     app.Run();
 

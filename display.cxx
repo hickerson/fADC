@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <math.h>
 #include "TH1.h"
 #include "TH2.h"
 #include "TFile.h"
@@ -44,7 +45,7 @@ void display(char *filename, int channel_1 = -1)
   //TString dir_name("H:/June30/");
   // TString dir_name("//Pcprad121/PRADUsers/WangPRAD/Data/FADC/He4/Sept2010/");
 
-  TString dir_name("Z:/UCNb/");
+  TString dir_name("/home/ucnbdaq/Data/UCNb/raw/");
   TString dir_file_name = dir_name + filename;
   FILE *fp = fopen(dir_file_name.Data(), "rb");
   unsigned char raw[2048];
@@ -73,7 +74,7 @@ void display(char *filename, int channel_1 = -1)
   vector<int> con_data;
   int count = 0;
 
-  TString dir_save("Z:/UCNb/Processed/");
+  TString dir_save("/home/ucnbdaq/Data/UCNb/processed/");
   //TString dir_save("H:/He4/");
   //TString dir_save("//Pcprad121/pradusers/WangPRAD/Data/FADC/He4/Sept2010/");
   TFile *f_out = new TFile( dir_save+TString(filename).ReplaceAll(".fat","")+".root", "RECREATE");
@@ -177,7 +178,7 @@ void display(char *filename, int channel_1 = -1)
 
  	  if (board_index == 0 && channel == 2) of_file << timestamp << "  " << timestamp_pre_entry[board_index][channel] << endl;
 	  if (timestamp < timestamp_pre_entry[board_index][channel] && 
-		  abs(timestamp - timestamp_pre_entry[board_index][channel]) > 0.95*k_timestamp_offset &&
+		  fabs(timestamp - timestamp_pre_entry[board_index][channel]) > 0.95*k_timestamp_offset &&
 		  timestamp_entry_count[board_index][channel] > 300 ) {
 	    timestamp_entry_count[board_index][channel] = 0;
 		timestamp_shift[board_index][channel] += k_timestamp_offset;
@@ -185,7 +186,7 @@ void display(char *filename, int channel_1 = -1)
  	    
 		if (board_index == 0 && channel == 2) {
 		  of_file << " * " << timestamp << "  " << timestamp_pre_entry[board_index][channel] 
-		       << "  " << abs(timestamp - timestamp_pre_entry[board_index][channel])*1.0/k_timestamp_offset
+		       << "  " << fabs(timestamp - timestamp_pre_entry[board_index][channel])*1.0/k_timestamp_offset
 			   << endl;
           printf("timestamp for board %i channel %i reset ... \n", board, channel);
           of_file << "timestamp for board " << board << " channel " << channel << " reset ... " << endl;

@@ -18,6 +18,10 @@
 #include <stdlib.h>
 
 #define NUM_PMTS 1
+#define use_pulse_area 1
+#define pulse_width 80 //ns
+
+using namespace std;
 
 // TODO move to own file...
 class Spectrum
@@ -36,31 +40,6 @@ void usage(const char * arg_name)
 {
 	printf("Usage: %s <signal run number> <background run number>\n", arg_name);
 }
-
-/*
-TF1* FitPedestal(const char *name, TTree *tree, TCut* cut)
-{
-	char pedestal_name[1024];
-	sprintf(pedestal_name, "pedestal_histogram_%s", name);
-	char pedestal_draw[1024];
-	sprintf(pedestal_draw, "%s >> %s", name, pedestal_name);
-	TH1F* pedestal_histogram = new TH1F(pedestal_name, "Pedestal Events", 2000,0,2000);
-	tree->Draw(pedestal_draw, *cut);
-	int max_bin = pedestal_histogram->GetMaximumBin();
-	float max_bin_x = pedestal_histogram->GetBinCenter(max_bin);
-  	TF1 *fit = new TF1("gauss_fit", "gaus", max_bin_x-12, max_bin_x+12);
-	if (!pedestal_histogram->Fit(fit, "R"))
-	{
-		printf("Pedestal fit success: mu = %g, sigma = %g\n",fit->GetParameter(1),fit->GetParameter(2));
-		return fit;
-	} 
-	else 
-	{
-		printf("Couldn't fit pedestal to %s.\n", name);
-		return 0;
-	}
-}
-*/
 
 int main (int arg_c, char **arg_v)
 {
@@ -87,34 +66,13 @@ int main (int arg_c, char **arg_v)
 		usage(arg_v[0]);
 		exit(1);
   	}
-
-/* we'll see if this is nessesary...
-	float scan_time = 15.0; // in minutes
-  	float scan_start_time = 1.0; // in minutes
-  	if (arg_c > 2) 
-  	{
-		scan_start_time = atof(arg_v[2]);
-	}
-		
-  	if (arg_c > 3) 
-  	{
-		scan_time = atof(arg_v[3]);
-	}
-*/
 		
   	// Construct run filename
-  	//char beta_filename[1024];
-  	//sprintf(beta_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[1]);
-	// TODO check envs
-  	//char background_filename[1024];
-  	//sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
-  	//sprintf(background_filename, "/home/kevinh/Data/UCN/UCNb2010/processed/run%s_2D.root", arg_v[2]);
- 
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
-	TString beta_filename(root_data_dir + "run" + arg_v[1] + "_2D.root");
-	TString back_filename(root_data_dir + "run" + arg_v[2] + "_2D.root");
+	TString beta_filename(root_data_dir + "/run" + arg_v[1] + ".root");
+	TString back_filename(root_data_dir + "/run" + arg_v[2] + ".root");
 
-  	// Plot options
+	// Plot options
   	gStyle->SetOptStat(1);
   	gStyle->SetOptFit(1);
 
@@ -122,14 +80,15 @@ int main (int arg_c, char **arg_v)
   	TFile* beta_file = new TFile(beta_filename);
   	if (beta_file->IsZombie())
   	{
-		printf("File "+beta_filename+"not found.\n");
+		//printf("File "+beta_filename+"not found.\n");
+		cout << "File " << beta_filename << "not found." << endl;
 		exit(1);
   	}
 
   	TTree* beta_tree = (TTree*)beta_file->Get("allEvents");
   	if (beta_tree == NULL)
   	{
-		printf("TTree not found in beta file "+beta_filename+".\n");
+		cout << "TTree not found in beta file " << beta_filename << endl;
         exit(0);
   	}
 
@@ -137,47 +96,49 @@ int main (int arg_c, char **arg_v)
   	TFile* back_file = new TFile(back_filename);
   	if (back_file->IsZombie())
   	{
-		printf("File "+back_filename+" not found.\n");
+		cout << "File " << back_filename << " not found." << endl;
 		exit(1);
   	}
 
   	TTree* back_tree = (TTree*)back_file->Get("allEvents");
   	if (back_tree == NULL)
   	{
-		printf("TTree not found in background file "+back_filename+".\n");
+		cout << "TTree not found in background file " << back_filename << endl;
         exit(0);
   	}
-
-  	// Define cuts
-	/*
-  	TH2F* his2D[NUM_PMTS];
-  	TProfile* p[NUM_PMTS];
-  	TCanvas* c[NUM_PMTS];
-  	TGraph* g[NUM_PMTS];
-  	TGraphErrors* resg[NUM_PMTS];
-	*/
 
   	gStyle->SetPalette(1);
   	gStyle->SetOptStat("");
 
-	int bin_count = 256;
-	int max_area = 4096*16;
+	int bin_count = 1024;
+	#if (use_pulse_area)
+	int max_area = 1024*pulse_width;
+	#else
+	int max_area = 4096;
+	#endif
 
 	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
   		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());
 	else
   		printf("Number of entries in the tree.%e\n", (double) beta_tree->GetEntries());
 
-	// This will be in a loop soon -->
+	// This will be in a loop soon --> <-- no YOU'LL be in a loop soon!
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
 	TString diff_hist_name("diff_spectrum_hist");
- 	TCut *beta_cut = new TCut("(channel==17) && ((maxSample-pedestal) < 4095) && (area > 0)");
+ 	//TCut *beta_cut = new TCut("(channel==20) && ((maxInterp-pedestal) < 4096) && (area > 0)");
+ 	TCut *beta_cut = new TCut("(channel==23) && ((maxInterp-pedestal) < 3000) && (area > 0)");
 
-	TString beta_draw_cmd("(area) >> "+beta_hist_name);
-	TString back_draw_cmd("(area) >> "+back_hist_name);
-	TString diff_draw_cmd("(area) >> "+diff_hist_name);
-	TH1F* beta_hist = new TH1F(beta_hist_name, "UCN Events", bin_count, 0, max_area);
+	#if (use_pulse_area)
+		TString beta_draw_cmd("(area) >> "+beta_hist_name);
+		TString back_draw_cmd("(area) >> "+back_hist_name);
+		TString diff_draw_cmd("(area) >> "+diff_hist_name);
+	#else
+		TString beta_draw_cmd("(maxInterp-pedestal) >> "+beta_hist_name);
+		TString back_draw_cmd("(maxInterp-pedestal) >> "+back_hist_name);
+		TString diff_draw_cmd("(maxInterp-pedestal) >> "+diff_hist_name);
+	#endif
+	TH1F* beta_hist = new TH1F(beta_hist_name, "UCN", bin_count, 0, max_area);
 	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
 	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
 	

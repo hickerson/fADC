@@ -29,18 +29,14 @@ ClassImp(NGammaEvent)
 #define NBOARD 4 
 #define CHANNELS_PER_BOARD 8	// canonical channels/board
 #define TIME_CHUNK 10			// number of seconds of data to process at a time
-#define PEDESTAL_START 15 		// starting point for averaging
+#define PEDESTAL_START 5 // starting point for averaging
+#define PEDESTAL_SAMPLE_COUNT 15 // number of samples used for pedestal averaging
 
 // Boards 1/2 16ns/clock tick, 
 // Board 3: 10x slower 
 // later changed to variable on all boards
 
-const float k_clockMul[NBOARD][CHANNELS_PER_BOARD] = { 
-	{4,4,4,4,4,4,4,4}, 
-	{4,4,4,4,4,4,4,4}, 
-	{4,4,4,4,4,4,4,4}, 
-	{120,120,120,120,120,120,120,120}
-};
+const float k_clockMul[NBOARD][CHANNELS_PER_BOARD] = { {4,4,4,4,4,4,4,4}, {4,4,4,4,4,4,4,4}, {4,4,4,4,4,4,4,4}, {120,120,120,120,120,120,120,120}};
 
 /// time-sorting comparison
 bool compareEventsByTime(NGammaEvent p1, NGammaEvent p2) { return p1.peakTime < p2.peakTime; }
@@ -48,12 +44,9 @@ bool compareEventsByTime(NGammaEvent p1, NGammaEvent p2) { return p1.peakTime < 
 /// pulse shape fit functions
 double fit_func(double *x, double *par)
 {
-  if (x[0] < par[0]) 
-	return par[2];
-  else if (x[0] < par[1]) 
-	return par[2] + (x[0]-par[0])/(par[1]-par[0])*(par[3]-par[2]);
-  else 
-	return par[3] + (x[0]-par[1])*par[4];
+  if (x[0] < par[0]) return par[2];
+  else if (x[0] < par[1]) return par[2] + (x[0]-par[0])/(par[1]-par[0])*(par[3]-par[2]);
+  else return par[3] + (x[0]-par[1])*par[4];
 }
 
 /// class for handling board readout
@@ -63,10 +56,10 @@ public:
 	BoardData(int basenum, const float *cmul, unsigned int nchan = CHANNELS_PER_BOARD):
 	  baseNumber(basenum), nChannels(nchan), prevtimestamp(-666), timewrap(1<<28), nEventDraw(100), extractOption(1) { 
 		data.resize(nChannels);
-		printf("board basenum : %d \n", basenum);
+		//debug: printf("board basenum : %d \n", basenum);
 		for (unsigned int i=0; i<nChannels; i++) {
 			clockMul[i] = cmul[i];
-			printf("cmul[%d] = %f \n", i, clockMul[i]);
+			//debug: printf("cmul[%d] = %f \n", i, clockMul[i]);
 			timeoffset[i] = 0;
 			iEventDraw[i] = 0;
 		}
@@ -134,16 +127,16 @@ public:
 				
 				// timestamp wraparound fix
 				while(timestamp+timeoffset[c]-prevtimestamp < -timewrap/2 && j > 2)
-					{ printf("b %i c %i timestamp %lld timeoffset %lld prevtimestamp %lld\n", baseNumber, c, timestamp, timeoffset[c], prevtimestamp);
+					{ //debug: printf("b %i c %i timestamp %lld timeoffset %lld prevtimestamp %lld\n", baseNumber, c, timestamp, timeoffset[c], prevtimestamp);
 					  timeoffset[c] += timewrap;
-					  printf("timeoffset %lld\n", timeoffset[c]);
+					  //debug: printf("timeoffset %lld\n", timeoffset[c]);
 					}
 				while(timestamp+timeoffset[c]-prevtimestamp > timewrap/2 && j > 2)
-					{ printf("b %i c %i timestamp %lld timeoffset %lld\n", baseNumber, c, timestamp, timeoffset[c]);
+					{ //debug: printf("b %i c %i timestamp %lld timeoffset %lld\n", baseNumber, c, timestamp, timeoffset[c]);
 					  timeoffset[c] -= timewrap; 
-					  printf("timeoffset %lld\n", timeoffset[c]);
+					  //debug: printf("timeoffset %lld\n", timeoffset[c]);
 					}
-				//printf("timeoffset %lld\n", timeoffset[c]);
+				//debug printf("timeoffset %lld\n", timeoffset[c]);
 				timestamp += timeoffset[c];
 				
 				if(0) {
@@ -230,13 +223,15 @@ public:
 		
 		// find the pedestal by averaging the first four samples
 		// find the pedestal by averaging the five samples close to the peak
-		double pedestal = (samples[PEDESTAL_START] + samples[1+PEDESTAL_START] + samples[2+PEDESTAL_START] + samples[3+PEDESTAL_START]+samples[5+PEDESTAL_START]) / 5.0;
+		double pedestal = 0;
+		for (int i = 0; i < PEDESTAL_SAMPLE_COUNT; i++)
+			pedestal += samples[PEDESTAL_START + i];
+		pedestal /= PEDESTAL_SAMPLE_COUNT;
 		
 		// Add up the total area
 		double area = 0;
 		//for(std::vector<int>::iterator it = std::max(maxSample +20,samples.begin()); it < std::min(maxSample + 81,samples.end()); it++)
-		for(std::vector<int>::iterator it = samples.begin(); 
-			it < samples.end(); it++)
+		for(std::vector<int>::iterator it = samples.begin(); it < samples.end(); it++)
 			area += (*it - pedestal)*clockMul[channel-baseNumber];
 		
 		// find interpolated peak around max using 3-point parabola
@@ -331,7 +326,7 @@ public:
 				}
 
 				double threshold = 0.4;
-				for (int i = dEdx_min_t; i >= 0; i--)
+				for (int i = (int)dEdx_min_t; i >= 0; i--)
                                 {
                                         if ( h0_slope->GetBinContent(i+1) > threshold * dEdx_min )
                                         {
@@ -340,7 +335,7 @@ public:
 						break;
                                         }
                                 }
-                                for (int i = dEdx_min_t; i < h0_slope->GetNbinsX(); i++)
+                                for (int i = (int)dEdx_min_t; i < h0_slope->GetNbinsX(); i++)
                                 {
                                         if ( h0_slope->GetBinContent(i+1) > threshold * dEdx_min )
                                         {
@@ -357,7 +352,7 @@ public:
                 if (iEventDraw[channel-baseNumber] < nEventDraw && dEdx_min < -4)
                 {
 			TString c_name("c_"); c_name += channel; c_name += "_"; c_name += iEventDraw[channel-baseNumber];
-			std::cout << c_name << std::endl;
+			//debug std::cout << c_name << std::endl;
 			TCanvas *c = new TCanvas(c_name, c_name, 1200, 800);
 			TH1F *h1 = new TH1F("h1", "h1", samples.size(), 0, samples.size());
 			TH2F *h2 = new TH2F("h2", "h2", 100, *minSample, *maxSample, 100, -50, 50);
@@ -462,8 +457,8 @@ public:
 		// fill event data
 		NGammaEvent ev;
 		ev.channel = channel;
-		ev.triggerTime = t0 * clockMul[channel-baseNumber];
-		ev.peakTime = (t0 + int(maxSample-samples.begin())) * clockMul[channel-baseNumber];
+		ev.triggerTime = Long64_t(t0 * clockMul[channel-baseNumber]);
+		ev.peakTime = Long64_t((t0 + int(maxSample-samples.begin())) * clockMul[channel-baseNumber]);
 		ev.peakTimeInterp = (t0 + centerInterp) * clockMul[channel-baseNumber];
 		ev.pedestal = pedestal;
 		ev.minSample = *minSample;
@@ -497,7 +492,7 @@ public:
 
             if( (t0*clockMul[channel-baseNumber] > 2.79e9 && t0*clockMul[channel-baseNumber] < 3e9) ) 
             {
-                std::cout << "t0 " << t0*clockMul[channel-baseNumber] << " size " << samples.size() << std::endl;
+                //debug: std::cout << "t0 " << t0*clockMul[channel-baseNumber] << " size " << samples.size() << std::endl;
                 std::vector<double> slope_l;
                 std::vector<double> slope_r;
                 std::vector<double> slope_delta;
@@ -509,7 +504,7 @@ public:
                   slope_l.push_back( y2-y1 );
                   slope_r.push_back( y3-y2 );
                   slope_delta.push_back( (y3-y2)-(y2-y1) );
-                  printf("y %e slope_l %e r %e delta %e \n", y2, y2-y1, y3-y2, (y3-y2)-(y2-y1));
+                  //printf("y %e slope_l %e r %e delta %e \n", y2, y2-y1, y3-y2, (y3-y2)-(y2-y1));
                 }
                 }
                 //for(std::vector<double>::iterator it = slope_delta.begin(); it < slope_delta.end(); it++)
@@ -536,21 +531,25 @@ protected:
 };
 
 
-
-
-
-
-
-
 void process_file(char* input_filename, RollingWindow* W)
 {
-	// open input file
-    TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
+    // open input file
+    //TString dir_name("/home/kevinh/Data/UCN/UCNb2010/raw/");
+    //TString raw_dir_name(getenv("UCNb_RAW_DATA_DIR"));
 
-    FILE* input_fp = fopen(dir_name+input_filename, "rb");
+    FILE* input_fp = fopen(input_filename, "rb");    // try full path name or base directory first
+/*
     if (!input_fp) {
-		fprintf(stderr, "Unable to open %s: ",  (dir_name+input_filename).Data());
-		perror("");
+    	input_fp = fopen(raw_dir_name+"/"+input_filename, "rb");
+    }
+*/
+    if (!input_fp) {
+		fprintf(stderr, "Unable to open %s: \n", input_filename);
+/*
+		fprintf(stderr, "Unable to open %s: \n",  TString(raw_dir_name+"/"+input_filename).Data());
+    	if(raw_dir_name.CompareTo(""))
+			perror("The environmental variable UCNb_RAW_DATA_DIR does not seem to be set.");
+*/
 		exit(1);
     }
 	
@@ -565,7 +564,7 @@ void process_file(char* input_filename, RollingWindow* W)
 	printf("Reading from file '%s'...\n",input_filename);
 	int event_number = 0;
 	std::deque<NGammaEvent> events;
-    while (!feof(input_fp)) {
+    	while (!feof(input_fp)) {
 		
 		double blockStartTime = -1;		// start time [s] of current data block
 		double packetTime = -1;			// time [s] of most recently read packet
@@ -635,28 +634,30 @@ void process_file(char* input_filename, RollingWindow* W)
 
 int main(int argc, char *argv[])
 {
-    //printf("begin \n");
-    if (argc != 2) {
-		printf("Usage: <input> \n");
+    if (argc < 3) {
+		printf("Usage: <raw data filename> <processed filename>\n");
 		exit(1);
     }
 
+    //for (int i = 1; i < argc; i++)
+    //{
 	// open output file
 	//TString dir_save("Z:/UCNb/Processed/");
-	TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
+	//TString dir_save("/home/kevinh/Data/UCN/UCNb2010/processed/");
+	//TString dir_save(getenv("UCNb_PROCESSED_DATA_DIR"));
 
-	TFile* output_file = new TFile(dir_save+TString(argv[1]).ReplaceAll(".fat","")+"_2D.root", "RECREATE");
+	//TFile* output_file = new TFile(dir_save+"/"+TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
+	//TFile* output_file = new TFile(TString(argv[1]).ReplaceAll(".fat","")+".root", "RECREATE");
+	TFile* output_file = new TFile(TString(argv[2]), "RECREATE");
 	std::cout << output_file->GetName() << std::endl;
 	
-
 	// rolling window for coincidences within 100 clock cycles (?? what are these units)
 	RollingWindow W(6000);
 	
 	// recorder for all events
 	RecordAllEvents RA;
 	W.addProcessor(&RA);
-
- /*
+/*
 	// 2-way coincidences betweem channels 1 and 2
 	MultiCoincidence MC("chan_16_17");
 	MC.addCoincidentChannel(16);
@@ -695,12 +696,12 @@ int main(int argc, char *argv[])
             }
         }
 */
-    // scan events in input file
-    process_file(argv[1], &W);
+        // scan events in input file
+        process_file(argv[1], &W);
 	
 	// close output file
-    output_file->Write();
-    output_file->Close();
-	
-	return 0;
+        output_file->Write();
+        output_file->Close();
+    //}
+    return 0;
 }
