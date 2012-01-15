@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "TH1.h"
 #include "TH2.h"
@@ -46,8 +47,12 @@ void display(char *filename, int channel_1 = -1)
   // TString dir_name("//Pcprad121/PRADUsers/WangPRAD/Data/FADC/He4/Sept2010/");
 
   TString dir_name("/home/ucnbdaq/Data/UCNb/raw/");
+  //TString dir_name(getenv("UCNb_RAW_DATA_DIR"));
   TString dir_file_name = dir_name + filename;
   FILE *fp = fopen(dir_file_name.Data(), "rb");
+  if (not fp)
+	cout << "can't find file " << dir_file_name << endl;
+
   unsigned char raw[2048];
 
   ofstream of_file("run.log");
@@ -75,6 +80,7 @@ void display(char *filename, int channel_1 = -1)
   int count = 0;
 
   TString dir_save("/home/ucnbdaq/Data/UCNb/processed/");
+  //TString dir_save(getenv("UCNb_PROCESSED_DATA_DIR"));
   //TString dir_save("H:/He4/");
   //TString dir_save("//Pcprad121/pradusers/WangPRAD/Data/FADC/He4/Sept2010/");
   TFile *f_out = new TFile( dir_save+TString(filename).ReplaceAll(".fat","")+".root", "RECREATE");
@@ -227,7 +233,7 @@ void display(char *filename, int channel_1 = -1)
     // getchar();
 
   }
-  printf("timestamp num %d data num %d \n", con_timestamp.size(), con_data.size());
+  printf("timestamp num %d data num %d \n", (int)con_timestamp.size(), (int)con_data.size());
 
   for(int i = 0; i < k_nboard; i++) {
 	for (int j = 0; j < k_nchannel; j++) {
