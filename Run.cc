@@ -137,6 +137,7 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 	findFullEnergyEvents(10);
 	for (unsigned i = 0; i < energyEvents.size(); i++)
 	{
+		int coincidence_count = 0;
 		double area_sum = 0;
 		FullEnergyEvent* full_event = energyEvents[i];
 		full_event->maxSample = 0;
@@ -147,14 +148,15 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 			{
 				NGammaEvent* event = full_event->events[channel];
 				area_sum += event->area; // do stuff...
-				cout << event->area << "(" << event->channel << ", " << channel << ") + ";
+				//cout << event->area << "(" << event->channel << ", " << channel << ") + ";
 				if (event->maxSample > full_event->maxSample);
 					full_event->maxSample = event->maxSample;  
+				coincidence_count++;
 			}
 		}
 				
-		if (full_event->maxSample < 4096 and area_sum > 0) {
-			cout << " = " << area_sum << endl;
+		if (full_event->maxSample < 4096 and area_sum > 0 and coincidence_count > 2) {
+			//cout << " = " << area_sum << endl;
 			hist->Fill(area_sum);
 			num++;
 		}
