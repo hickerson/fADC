@@ -1,0 +1,18 @@
+{
+	"data": [
+		{
+			"date": "Tue Dec 21 22:25:01 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{
+			"date": "Tue Dec 21 22:42:29 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{
+			"date": "Tue Dec 21 22:52:29 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{
+			"date": "Tue Dec 21 23:02:29 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{
+			"date": "Tue Dec 21 23:12:29 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{
+			"date": "Tue Dec 21 23:22:29 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" },
+		{
+			"date": "Tue Dec 21 23:32:29 UTC 2010", "run": 3846, "runtime": 600, "sleep": 0, "type": "Bi207", "GeHV": 4, "gas": "vacuum", "HV": 1.24, "LED": "fixed" }
+	]
+}

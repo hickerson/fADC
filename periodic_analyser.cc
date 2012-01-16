@@ -24,6 +24,7 @@
 
 // UCNb INCLUDES
 #include "NGammaEvent.h"
+#include "PeriodicSpectrum.hh"
 
 #define NUM_PMTS 1
 
@@ -224,25 +225,14 @@ int MakeHistogram(TString filename, TString hist_name, TH2F** area_time_hist, TH
         	exit(1);
   	}
 
-	if ( verbose ) {
-		if ( tree->GetEntries() == (long)tree->GetEntries())
-  			printf("Number of entries in the tree %li.\n", (long) tree->GetEntries());
-		else
-  			printf("Number of entries in the tree %e.\n", (double) tree->GetEntries());
-	}
+	TString filename;
+	PeriodicPattern foreground_pattern;
+	PeriodicPattern background_pattern;
+	PeriodicCuts cuts;
 
-	*area_time_hist = new TH2F(hist_name+"_area_time_hist", "Counts per time and area", 
-				   time_bin_count, 0, scan_time/1E9, area_bin_count, 0, max_area);
-	*time_hist = new TH1F(hist_name+"_time_hist", "Counts per time", time_fine_ratio*time_bin_count, 0, scan_time/1E9);
-	*area_hist = new TH1F(hist_name+"_area_hist", "Visible energy", area_fine_ratio*area_bin_count, 0, max_area);
-	
-	Long64_t num = 0;
-	NGammaEvent* event = new NGammaEvent();
-        tree->SetBranchAddress("evt", &event);
-	
-	int N = tree->GetEntries();
-	tree->GetEntry(0);
-	Long64_t first_time = event->peakTime;
+	foreground_pattern.start_time = Long64_t(0);       // ns
+	foreground_pattern.scan_time = Long64_t(5.2E9); 	// ns
+	foreground_pattern.max_time = Long64_t(520E9); 	// ns
 
 	for (int i = 0; i < N; i++)
 	{
@@ -341,16 +331,16 @@ int main (int arg_c, char **arg_v)
   	if (arg_c > 4) 
   	{
 		foreground_pattern.scan_time = Long64_t(atof(arg_v[4]) * 1E9);
-		time_bin_count = int(atof(arg_v[4])*10);
-		printf("time bin count %d\n", time_bin_count);
+		cuts.time_bin_count = int(atof(arg_v[4])*10);
+		printf("time bin count %d\n", cuts.time_bin_count);
 	}
 	background_pattern.scan_time = foreground_pattern.scan_time;
 	
   	if (arg_c > 5) 
   	{
 		foreground_pattern.max_time = Long64_t(atof(arg_v[5]) * 1E9);
-		time_fine_ratio = atof(arg_v[5]) / time_bin_count;
-		printf("time bin count multiplier %f\n", time_fine_ratio);
+		cuts.time_fine_ratio = atof(arg_v[5]) / cuts.time_bin_count;
+		printf("time bin count multiplier %f\n", cuts.time_fine_ratio);
 	}
 	background_pattern.max_time = foreground_pattern.max_time;
 
@@ -377,35 +367,26 @@ int main (int arg_c, char **arg_v)
 	PeriodicSpectrum* background = 0;
 
 	//foreground = new PeriodicSpectrum(fore_filename, "foreground", start_time, scan_time, max_time, +1);
-	foreground = new PeriodicSpectrum(foreground_filename, "foreground", foreground_pattern, +1);
+	foreground = new PeriodicSpectrum(foreground_filename, "foreground", foreground_pattern, cuts, +1);
 	if (foreground)
 	{
-		foreground->LoadFile();
-		foreground->GetTriggerPattern();
-		foreground->MakeHistogram();
+		foreground->loadFile();
+		foreground->getTriggerPattern();
+		foreground->makeHistogram();
 	}
 
 	if (background_run)
 	{
 		//background = new PeriodicSpectrum(back_filename, "background", background_start_time, scan_time, max_time, -1/10);
-		background = new PeriodicSpectrum(background_filename, "background", background_pattern, -1);
+		background = new PeriodicSpectrum(background_filename, "background", background_pattern, cuts, -1);
 		if (background)
 		{
-			background->LoadFile();
-			background->GetTriggerPattern();
-			background->MakeHistogram();
+			background->loadFile();
+			background->getTriggerPattern();
+			background->makeHistogram();
 		}
 	}
 
-/*
-  	// Open beta ntuple
-	TH2F* fore_area_time_hist;
-	TH1F* fore_time_hist;
-	TH1F* fore_area_hist;
-	TH2F* back_area_time_hist;
-	TH1F* back_time_hist;
-	TH1F* back_area_hist;
-*/	
 	TH2F* diff_area_time_hist;
 	TH1F* diff_time_hist;
 	TH1F* diff_area_hist;
@@ -505,7 +486,7 @@ int main (int arg_c, char **arg_v)
 	}
 
 	int cycles = foreground_pattern.max_time / foreground_pattern.scan_time;
-	Long64_t time_window = upper_time_cut - lower_time_cut;
+	Long64_t time_window = cuts.upper_time_cut - cuts.lower_time_cut;
 	Long64_t live_time = time_window * cycles;
 	double back_counts = diff_area_hist->Integral();
 	double fore_counts = diff_area_hist->Integral();

@@ -1,6 +1,7 @@
 // ROOT INCLUDES
 #include <TFile.h>
 #include <TTree.h>
+#include <TChain.h>
 #include <TString.h>
 #include <TCut.h>
 #include <TProfile.h>
@@ -18,15 +19,19 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+// STL INCLUDES
+#include <vector>
+
+// INCLUDES
+#include "PeriodicSpectrum.hh"
+
 #define NUM_PMTS 1
 
 using namespace std;
 
-// g++ `root-config --cflags` `root-config --libs` spectrum_analyser.cc -o spectrum_analyser
-
 /**
  * Authors: Kevin Peter Hickerson
- * Date: Dec 2010
+ * Date: Oct 2011
  */
 void usage(const char * arg_name) 
 {
@@ -35,36 +40,60 @@ void usage(const char * arg_name)
 
 int main (int arg_c, char **arg_v)
 {
+	PeriodicSpectrum foreground("foreground_hist", "foreground");
+	PeriodicSpectrum background("background_hist", "background");
+	PeriodicSpectrum difference("difference_hist", "difference");
+	PeriodicSpectrum* spectra[3] = { &foreground, &background, &difference };
+
 	opterr = 0;
 	int c;
-	while ((c = getopt(arg_c, arg_v, "fbs")) != -1)
+	while ((c = getopt(arg_c, arg_v, "f:b:s:")) != -1)
 	{
+		int run = 0;
+		if (optarg)
+			run = atoi(optarg);
+		if (run == 0)
+		{
+			printf("Need a valid beta run number.\n");
+			usage(arg_v[0]);
+			exit(1);
+		}
+		TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
+		TString filename(root_data_dir + "/run" + optarg + ".root");
+
 		switch (c)
 		{
 			case 'f':
 				printf("option -f\n");
+				foreground.addToChain(filename);
 				break;
+
 			case 'b':
 				printf("option -b\n");
+				background.addToChain(filename);
 				break;
+
 			case 's':
 				printf("option -s\n");
 				break;
+
 			default:
-				printf("unknown option.\n");
-				//usage(arg_v[0]);
-				//abort();
+				printf("unknown option or missing argument.\n");
+				usage(arg_v[0]);
+				abort();
 		}
+
 	}
 
 	int index = optind;
-	printf("index %d\n", index);
-  	if (arg_c < 2 + index)
+  	if (arg_c < index)
   	{
+		puts("Not enough arguments.");
 		usage(arg_v[0]);
 		exit(1);
   	}
 
+/*
   	int foreground_run = atoi(arg_v[index]);
   	if (foreground_run == 0)
   	{
@@ -80,61 +109,42 @@ int main (int arg_c, char **arg_v)
 		usage(arg_v[0]);
 		exit(1);
   	}
-
+*/
 	int rootarg_c = 0;
  	TApplication app("Ge Spectrum Analysis", &rootarg_c, 0);
 
+/*
 	TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
 	TString beta_filename(root_data_dir + "/run" + arg_v[1] + ".root");
 	TString back_filename(root_data_dir + "/run" + arg_v[2] + ".root");
+*/
 
-  // Plot options
+   // Plot options
   	gStyle->SetOptStat(1);
   	gStyle->SetOptFit(1);
-
-  	// Open beta ntuple
-  	TFile* beta_file = new TFile(beta_filename);
-  	if (beta_file->IsZombie())
-  	{
-		//printf("File "+beta_filename+"not found.\n");
-		cout << "File " << beta_filename << "not found." << endl;
-		exit(1);
-  	}
-
-  	TTree* beta_tree = (TTree*)beta_file->Get("allEvents");
-  	if (beta_tree == NULL)
-  	{
-		cout << "TTree not found in beta file " << beta_filename << endl;
-        exit(0);
-  	}
-
-  	// Open background ntuple
-  	TFile* back_file = new TFile(back_filename);
-  	if (back_file->IsZombie())
-  	{
-		cout << "File " << back_filename << " not found." << endl;
-		exit(1);
-  	}
-
-  	TTree* back_tree = (TTree*)back_file->Get("allEvents");
-  	if (back_tree == NULL)
-  	{
-		cout << "TTree not found in background file " << back_filename << endl;
-        	exit(0);
-  	}
-
   	gStyle->SetPalette(1);
-  	gStyle->SetOptStat("");
 
 	int bin_count = 1024;
 	//int max_area = 4096*200;
 	int max_area = 4096;
 
+	/*
 	if ( beta_tree->GetEntries() == (long)beta_tree->GetEntries())
   		printf("Number of entries in the tree.%li\n", (long) beta_tree->GetEntries());
 	else
   		printf("Number of entries in the tree.%e\n", (double) beta_tree->GetEntries());
+	*/
 
+	TString draw_cmd("(maxInterp) >> %s");
+ 	TCut *beta_cut = new TCut("(channel==17) && ((maxSample-pedestal) < 2750) && (area > 0)");
+	TCanvas* canvas = new TCanvas("canvas", "Beta spectrum and background", 1920/2, 1080/2);
+	beta_tree->Draw(beta_draw_cmd, *beta_cut);
+	diff_hist->Add(back_hist, -1.0);
+	beta_hist->Draw();
+	back_hist->Draw("same");
+	diff_hist->Draw("same");
+
+	/*	
 	// This will be in a loop soon -->
 	TString beta_hist_name("beta_spectrum_hist");
 	TString back_hist_name("back_spectrum_hist");
@@ -161,9 +171,8 @@ int main (int arg_c, char **arg_v)
 	beta_hist->Draw();
 	back_hist->Draw("same");
 	diff_hist->Draw("same");
-	//canvas.Print(
+	*/
 
-  app.Run();
-
-  return 0;
+    app.Run();
+    return 0;
 }

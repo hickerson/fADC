@@ -138,7 +138,7 @@ int main (int arg_c, char **arg_v)
 		TString back_draw_cmd("(maxInterp-pedestal) >> "+back_hist_name);
 		TString diff_draw_cmd("(maxInterp-pedestal) >> "+diff_hist_name);
 	#endif
-	TH1F* beta_hist = new TH1F(beta_hist_name, "UCN", bin_count, 0, max_area);
+	TH1F* beta_hist = new TH1F(beta_hist_name, "Visible Energy", bin_count, 0, max_area);
 	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
 	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
 	

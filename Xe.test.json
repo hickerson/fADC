@@ -1,0 +1,17 @@
+{
+	"data": [
+		{ 	
+			"date": "Wed Dec 22 00:54:40 UTC 2010", 
+			"run":3854, "rawfile":"run3854.fat", 
+			"runtime": 60, "sleep": 0, "bytes": 196700128, 
+			"cal": "Xe+", "GekV": 4, "gas": "Xe(150cell-mbar)+Ar(100torr)", 
+			"HVkV": 1.24, "led": "fixed", "ch22": "off" },
+		{ 	
+			"date": "Wed Dec 22 01:04:58 UTC 2010", 
+			"run":3855, "rawfile": "run3855.fat", 
+			"runtime": 60, "sleep": 0, "bytes": 198304250, 
+			"cal": "Xe+", "gas": "Xe(150cell-mbar)+Ar(100torr)", 
+			"GekV": 4, "HVkV": 1.24, "led": "fixed", "ch22": "off" }
+	]
+}
+
