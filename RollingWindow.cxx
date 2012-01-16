@@ -28,7 +28,7 @@ public:
 	/// process events in rolling window
 	virtual void processWindow(RollingWindow* W) {}	
 	/// print summary of collected events
-	virtual void printSummary() const { printf("Tree '%s' located %i events.\n",coincTree->GetName(),coincTree->GetEntries()); }
+	virtual void printSummary() const { printf("Tree '%s' located %i events.\n",coincTree->GetName(),(int)coincTree->GetEntries()); }
 	TTree* coincTree;	//< tree to contain coincidence data
 };
 
@@ -76,7 +76,7 @@ public:
 			printf("%i\t%i",it->first,it->second);
 			std::map<int, std::deque<NGammaEvent> >::const_iterator z = channelEvents.find(it->first);
 			if(z != channelEvents.end())
-				printf("\t[%i]",z->second.size());
+				printf("\t[%i]",(int)z->second.size());
 			printf("\n");
 			t += it->second;
 		}

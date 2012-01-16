@@ -10,8 +10,40 @@ fi
 case $1 in
 	ferrari)
 		echo "setting up for ferrari..."
+		export UCNb_DATA_DIR=/home/ucnb/data
 		export UCNb_RAW_DATA_DIR=/home/ucnb/data/raw
-		echo UCNb_RAW_DATA_DIR=/home/ucnb/data/raw
 		export UCNb_PROCESSED_DATA_DIR=/home/ucnb/data/processed
-		echo UCNb_PROCESSED_DATA_DIR=/home/ucnb/data/processed
+		;;
+	pcucn)
+		echo "setting up for for pcucn..."
+		export UCNb_DATA_DIR=/home/daq/ucnb/data
+		export UCNb_RAW_DATA_DIR=/home/daq/ucnb/data/raw
+		export UCNb_PROCESSED_DATA_DIR=/home/daq/ucnb/data/processed
+		;;
+	kevinh)
+		echo "setting up for kevinh..."
+		export UCNb_DATA_DIR=/home/kevinh/Data/UCN/UCNb2010
+		export UCNb_RAW_DATA_DIR=$UCNb_DATA_DIR/raw
+		export UCNb_PROCESSED_DATA_DIR=$UCNb_DATA_DIR/processed
+		;;
+	ucnbdaq)
+		echo "setting up for ucnbdaq..."
+		export UCNb_DATA_DIR=/home/ucnbdaq/Data/UCNb
+		export UCNb_RAW_DATA_DIR=$UCNb_DATA_DIR/raw
+		export UCNb_PROCESSED_DATA_DIR=$UCNb_DATA_DIR/processed
+		;;
+	ucnbdata)
+		echo "setting up for ucnbdata..."
+		export UCNb_DATA_DIR=/media/ucnbdata/Data
+		export UCNb_RAW_DATA_DIR=$UCNb_DATA_DIR/raw
+		export UCNb_PROCESSED_DATA_DIR=$UCNb_DATA_DIR/processed
+		;;
 esac
+
+echo UCNb_DATA_DIR=$UCNb_DATA_DIR
+echo UCNb_RAW_DATA_DIR=$UCNb_RAW_DATA_DIR
+echo UCNb_PROCESSED_DATA_DIR=$UCNb_PROCESSED_DATA_DIR
+
+export UCNb_DATA_DIR
+export UCNb_RAW_DATA_DIR
+export UCNb_PROCESSED_DATA_DIR
