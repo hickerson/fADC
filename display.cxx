@@ -46,8 +46,8 @@ void display(char *filename, int channel_1 = -1)
   //TString dir_name("H:/June30/");
   // TString dir_name("//Pcprad121/PRADUsers/WangPRAD/Data/FADC/He4/Sept2010/");
 
-  TString dir_name("/home/ucnbdaq/Data/UCNb/raw/");
-  //TString dir_name(getenv("UCNb_RAW_DATA_DIR"));
+  //TString dir_name("/home/ucnbdaq/Data/UCNb/raw/");
+  TString dir_name(getenv("UCNb_RAW_DATA_DIR"));
   TString dir_file_name = dir_name + filename;
   FILE *fp = fopen(dir_file_name.Data(), "rb");
   if (not fp)

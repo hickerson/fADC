@@ -96,7 +96,8 @@ int main (int arg_c, char **arg_v)
 
 	runGroup.bin_count = 140;
 	runGroup.min_area = 0;
-	runGroup.max_area = 140000;
+	//runGroup.max_area = 140000;
+	runGroup.max_area = 16000;
 	int channel = 24;
 
 /*
@@ -163,9 +164,10 @@ int main (int arg_c, char **arg_v)
 		// create the global canvas
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
 		vector<int> channels;
-		channels.push_back(20);
-		channels.push_back(21);
-		channels.push_back(23);
+		channels.push_back(16);
+		channels.push_back(17);
+		channels.push_back(18);
+		channels.push_back(19);
 
 		// select out the foreground runs
 		cout << arg_v[1] << endl;

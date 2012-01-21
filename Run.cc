@@ -96,7 +96,7 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 			//NanoSeconds sample_time = this_time - start_time;
 			// TODO NanoSeconds cycle_time = ((sample_time + scan_time - start_time) % scan_time); // seconds
 			double area = event->area / 32;  
-			double pulse_height = event->maxSample;  
+			double pulse_height = event->maxSample - event->pedestal;  
 			//double charge = area;
 
 			//if (event->channel == 21 && sample_time < stop_time)
@@ -105,7 +105,8 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 				if (pulse_height < 4096) {
 					//if (charge > cuts.lower_area_cut && charge < cuts.upper_area_cut)
 						//hist->Fill(double(cycle_time/1E9));
-					hist->Fill(area);
+					//hist->Fill(area);
+					hist->Fill(pulse_height);
 					num++;
 				}
 			}
@@ -139,6 +140,7 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 	{
 		int coincidence_count = 0;
 		double area_sum = 0;
+		double pulse_sum = 0;
 		FullEnergyEvent* full_event = energyEvents[i];
 		full_event->maxSample = 0;
 		for (unsigned j = 0; j < channels.size(); j++)
@@ -148,6 +150,7 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 			{
 				NGammaEvent* event = full_event->events[channel];
 				area_sum += event->area; // do stuff...
+				pulse_sum += event->maxInterp - event->pedestal;
 				//cout << event->area << "(" << event->channel << ", " << channel << ") + ";
 				if (event->maxSample > full_event->maxSample);
 					full_event->maxSample = event->maxSample;  
@@ -157,7 +160,8 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 				
 		if (full_event->maxSample < 4096 and area_sum > 0 and coincidence_count > 2) {
 			//cout << " = " << area_sum << endl;
-			hist->Fill(area_sum);
+			//hist->Fill(area_sum);
+			hist->Fill(pulse_sum);
 			num++;
 		}
 	}
