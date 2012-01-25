@@ -83,6 +83,7 @@ int main (int arg_c, char **arg_v)
 
 	//RunGroup runGroup("Xe.runlog.json");
 	string json_filename(arg_v[1]);
+	string plot_name(arg_v[2]);
 	json_filename += ".json";
 	RunGroup runGroup(json_filename);
 	runGroup.load();
@@ -97,34 +98,8 @@ int main (int arg_c, char **arg_v)
 	runGroup.bin_count = 140;
 	runGroup.min_area = 0;
 	//runGroup.max_area = 140000;
-	runGroup.max_area = 16000;
-	int channel = 24;
-
-/*
-	TString beta_hist_name("beta_spectrum_hist");
-	TString back_hist_name("back_spectrum_hist");
-	TString diff_hist_name("diff_spectrum_hist");
-	char cut_str[1024];
- 	sprintf(cut_str, "(channel==%d) && ((maxSample-pedestal) < 2750) && (area > 0)", channel);
- 	TCut *beta_cut = new TCut(cut_str);
-
-	TString beta_draw_cmd("(maxInterp) >> "+beta_hist_name);
-	TString back_draw_cmd("(maxInterp) >> "+back_hist_name);
-	TString diff_draw_cmd("(maxInterp) >> "+diff_hist_name);
-	TH1F* beta_hist = new TH1F(beta_hist_name, "Ge events", bin_count, 0, max_area);
-	TH1F* back_hist = new TH1F(back_hist_name, "Background Events", bin_count, 0, max_area);
-	TH1F* diff_hist = new TH1F(diff_hist_name, "On - Off Events", bin_count, 0, max_area);
-
-	
-	beta_hist->SetLineColor(2);
-	back_hist->SetLineColor(4);
-	diff_hist->SetLineColor(1);
-	//run->tree->Draw(beta_draw_cmd, *beta_cut);
-	//beta_tree->Draw(diff_draw_cmd, *beta_cut);
-	//back_tree->Draw(back_draw_cmd, *beta_cut);
-	
-	diff_hist->Add(back_hist, -1.0);
-*/
+	runGroup.max_area = 8000;
+	//int channel = 24;
 
 /*
 	{
@@ -172,13 +147,13 @@ int main (int arg_c, char **arg_v)
 		// select out the foreground runs
 		cout << arg_v[1] << endl;
 		//runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
-		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, arg_v[1]);
+		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, arg_v[2]);
 		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
 		TH1F* h = runGroup.spectrum["full_energy"].foreground;
 		h->Draw("G");
 
 		// select out the background runs
-		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channel, "background");
+		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, "background");
 		//runGroup.spectrum["full_energy"].background->Draw("same");
 
 		// save global canvas to a pdf
@@ -187,15 +162,10 @@ int main (int arg_c, char **arg_v)
 	//	canvas->Print(data_pdf_filename.c_str());
 		char filename[1024];
 		//sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
-		sprintf(filename, "%s.full-energy.pdf", arg_v[1]);
+		sprintf(filename, "%s-%s.full-energy.pdf", arg_v[1], arg_v[2]);
 		canvas->Print(filename);
 	}
 
-
-
-	//beta_hist->Draw();
-	//back_hist->Draw("same");
-	//diff_hist->Draw("same");
 
     //app.Run();
     return 0;

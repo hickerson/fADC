@@ -19,7 +19,7 @@ int64_t Run::setTrigger() {
 TH1F* Run::getTimeHistogram(int channel) {
 	int time_bin_count = 100;
 
-	TH1F* time_hist = new TH1F(TSTRING(name+"_time_hist"), "Counts per time", int(time_bin_count), 0, 100);
+	TH1F* time_hist = new TH1F(TSTRING(name+"_time_hist"), name.c_str(), int(time_bin_count), 0, 100);
 	
 	int64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
@@ -72,7 +72,7 @@ TH1F* Run::getTimeHistogram(int channel) {
 
 TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max) 
 {
-	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), min, max);
+	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), name.c_str(), int(bin_count), min, max);
 	
 	int64_t num = 0;
 	NGammaEvent* event = new NGammaEvent();
@@ -130,9 +130,7 @@ TH1F* Run::getEnergyHistogram(int channel, int bin_count, int min, int max)
 
 TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int max) 
 {
-	//puts("tbd...");
-	//abort();
-	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", int(bin_count), min, max);
+	TH1F* hist = new TH1F(TSTRING(name+"_energy_hist"), name.c_str(), int(bin_count), min, max);
 	
 	int64_t num = 0;
 	findFullEnergyEvents(10);
@@ -152,14 +150,16 @@ TH1F* Run::getEnergyHistogram(vector<int> channels, int bin_count, int min, int 
 				area_sum += event->area; // do stuff...
 				pulse_sum += event->maxInterp - event->pedestal;
 				//cout << event->area << "(" << event->channel << ", " << channel << ") + ";
+				//cout << event->maxInterp - event->pedestal << " + ";
+				//cout << event->maxInterp - event->pedestal << " + (" << event->channel << ", " << (event->triggerTime % 1000000000) << ") + ";
 				if (event->maxSample > full_event->maxSample);
 					full_event->maxSample = event->maxSample;  
 				coincidence_count++;
 			}
 		}
 				
-		if (full_event->maxSample < 4096 and area_sum > 0 and coincidence_count > 2) {
-			//cout << " = " << area_sum << endl;
+		if (full_event->maxSample < 4096 and coincidence_count > 3) {
+			//cout << " = " << pulse_sum << endl;
 			//hist->Fill(area_sum);
 			hist->Fill(pulse_sum);
 			num++;
@@ -193,8 +193,6 @@ void Run::findFullEnergyEvents(NanoSeconds windowTime)
 		if (tree->GetEntry(i) > 0)
 		{
 			NanoSeconds this_time = event->peakTime;
-			full_event->events[event->channel] = event; // TODO replace with method
-
 			if (TMath::Abs(this_time - last_time) < windowTime)
 			{
 				//cout << event->area << endl;
@@ -207,11 +205,9 @@ void Run::findFullEnergyEvents(NanoSeconds windowTime)
 				full_event = new FullEnergyEvent();
 			}
 
-			/*
-			cout << "Event "<< event_num 
-				 <<" channel " << event->channel
-				 <<" event time " << this_time << endl;
-				 */
+			full_event->events[event->channel] = event; // TODO replace with method
+
+			//cout << "Event "<< event_num <<" channel " << event->channel <<" event time " << this_time << endl;
 		}
 	}
 }
