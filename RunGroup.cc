@@ -98,7 +98,7 @@ TH1F* RunGroup::getEnergyHistogram(int channel, string type)
 {
 	run_time = 0;
 
-	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
+	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), name.c_str(), bin_count, min_area, max_area);
 
 	cout << "number of runs " << runs.size() << endl;
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
@@ -119,7 +119,7 @@ TH1F* RunGroup::getEnergyHistogram(int channel, string type)
 	printf("total run time %f\n", run_time);
 
 	h->Scale(1/(run_time));
-	h->GetXaxis()->SetTitle("keV");
+	h->GetXaxis()->SetTitle("Ch sum");
 	h->GetYaxis()->SetTitle("rate");
 
 	return h;
@@ -131,7 +131,7 @@ TH1F* RunGroup::getEnergyHistogram(vector<int> channels, string type)
 {
 	run_time = 0;
 
-	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), "Counts per time", bin_count, min_area, max_area);
+	TH1F* h = new TH1F(TSTRING(name+"_energy_hist"), name.c_str(), bin_count, min_area, max_area);
 
 	cout << "number of runs " << runs.size() << endl;
 	for (vector<Run*>::size_type i = 0; i < runs.size(); i++) {
@@ -152,7 +152,7 @@ TH1F* RunGroup::getEnergyHistogram(vector<int> channels, string type)
 	printf("total run time %f\n", run_time);
 
 	h->Scale(1/(run_time));
-	h->GetXaxis()->SetTitle("keV");
+	h->GetXaxis()->SetTitle("Ch sum");
 	h->GetYaxis()->SetTitle("rate");
 
 	return h;

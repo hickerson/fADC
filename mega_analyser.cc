@@ -95,10 +95,11 @@ int main (int arg_c, char **arg_v)
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
 
-	runGroup.bin_count = 140;
+	runGroup.bin_count = 100;
 	runGroup.min_area = 0;
 	//runGroup.max_area = 140000;
-	runGroup.max_area = 8000;
+	runGroup.max_area = 5000;
+	runGroup.name = plot_name;
 	//int channel = 24;
 
 /*
@@ -163,6 +164,8 @@ int main (int arg_c, char **arg_v)
 		char filename[1024];
 		//sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
 		sprintf(filename, "%s-%s.full-energy.pdf", arg_v[1], arg_v[2]);
+		canvas->Print(filename);
+		sprintf(filename, "%s-%s.full-energy.gif", arg_v[1], arg_v[2]);
 		canvas->Print(filename);
 	}
 
