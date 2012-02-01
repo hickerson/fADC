@@ -1,0 +1,8 @@
+{
+	"data": [
+		{ "date": "", "run": 4063, "runtime": 300, "type": "Co60", "LED": "off" },
+		{ "date": "", "run": 4064, "runtime": 300, "type": "background", "LED": "off" },
+		{ "date": "", "run": 4065, "runtime": 300, "type": "Co60", "LED": "off" },
+		{ "date": "", "run": 4066, "runtime": 300, "type": "background", "LED": "off" }
+	]
+}

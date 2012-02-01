@@ -1,0 +1,31 @@
+{
+	"data": [
+		{ "date": "", "run": 4074, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4075, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4076, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4077, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4078, "runtime": 300, "type": "Cs137", "led": "off" },
+		{ "date": "", "run": 4080, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4081, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4082, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4083, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4084, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4085, "runtime": 300, "type": "Co60", "led": "off" },
+		{ "date": "", "run": 4086, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4087, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4088, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4089, "runtime": 300, "type": "ucn", "led": "off" },
+		{ "date": "", "run": 4090, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4091, "runtime": 300, "type": "led", "led": "fixed" },
+		{ "date": "", "run": 4093, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4094, "runtime": 300, "type": "capture", "led": "off" },
+		{ "date": "", "run": 4095, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4096, "runtime": 300, "type": "capture", "led": "off" },
+		{ "date": "", "run": 4097, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4098, "runtime": 300, "type": "capture", "led": "off" },
+		{ "date": "", "run": 4099, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4100, "runtime": 300, "type": "capture", "led": "off" },
+		{ "date": "", "run": 4101, "runtime": 300, "type": "background", "led": "off" },
+		{ "date": "", "run": 4102, "runtime": 300, "type": "capture", "led": "off" }
+	]
+}

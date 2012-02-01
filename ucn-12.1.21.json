@@ -1,0 +1,14 @@
+{
+	"data": [
+		{ "date": "", "run": 4051, "runtime": 300, "type": "background", "LED": "off" },
+		{ "date": "", "run": 4052, "runtime": 300, "type": "ucn", "LED": "off" },
+		{ "date": "", "run": 4053, "runtime": 300, "type": "background", "LED": "off" },
+		{ "date": "", "run": 4054, "runtime": 300, "type": "ucn", "LED": "off" },
+		{ "date": "", "run": 4055, "runtime": 300, "type": "background", "LED": "off" },
+		{ "date": "", "run": 4056, "runtime": 300, "type": "ucn", "LED": "off" },
+		{ "date": "", "run": 4057, "runtime": 30, "type": "Cs137", "LED": "off" },
+		{ "date": "", "run": 4058, "runtime": 300, "type": "background", "LED": "off" },
+		{ "date": "", "run": 4059, "runtime": 300, "type": "ucn", "LED": "off" },
+		{ "date": "", "run": 4060, "runtime": 30, "type": "Co60", "LED": "off" }
+	]
+}
