@@ -15,7 +15,7 @@ case $1 in
 		export UCNb_PROCESSED_DATA_DIR=/home/ucnb/data/processed
 		;;
 	pcucn)
-		echo "setting up for pcucn..."
+		echo "setting up for for pcucn..."
 		export UCNb_DATA_DIR=/home/daq/ucnb/data
 		export UCNb_RAW_DATA_DIR=/home/daq/ucnb/data/raw
 		export UCNb_PROCESSED_DATA_DIR=/home/daq/ucnb/data/processed
