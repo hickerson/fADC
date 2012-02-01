@@ -17,6 +17,8 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <iostream>
+#include <fstream>
 
 // C INCLUDES
 #include <math.h>
@@ -51,6 +53,21 @@ void usage(const char * arg_name)
 	printf("Usage: %s <signal run number> <background run number> [start time(s)] [scan time(s)] [max time(s)] [background start time(s)]\n", arg_name);
 }
 
+void read_file(const char * filename) 
+{
+    ifstream file;
+    file.open(filename);
+    string line;
+    if(file.is_open())
+    {
+        while (not file.eof())
+        {
+            file >> line;
+            cout << line;
+        }
+    }
+}
+
 void addSpectrum(TString filename, string name, PeriodicPattern pattern, PeriodicCuts cuts, PeriodicSpectrum **sum, double mult)
 {
 	// construct spectrum
@@ -79,8 +96,8 @@ int main (int arg_c, char **arg_v)
 	int file_count = 3;
 	//TString name[N] = {"Ce139", "Cd139", "Sn113", "Bi207", "background"};
 	//TString name[] = {"Bi207", "Bi207", "Bi207", "background"};
-	string name[] = {"Bi207", "Bi207", "background"};
-	TString run[] = {"3854", "3855", "3800"};
+	string name[] = {"Bi207", "Bi207", "background", "background", "background" };
+	TString run[] = {"3854", "3855", "3800", "", ""};
 	//int  run[] = {3814, 3800};
 	//double mult[] = {+1, +1, -3};
 	//TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
