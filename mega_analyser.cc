@@ -83,7 +83,14 @@ int main (int arg_c, char **arg_v)
 
 	//RunGroup runGroup("Xe.runlog.json");
 	string json_filename(arg_v[1]);
-	string plot_name(arg_v[2]);
+	string signal_name(arg_v[2]);
+	string background_name;
+	if (arg_c > 3)
+		background_name = arg_v[3];
+	else
+		background_name = "background";
+	string plot_name = signal_name + " - " + background_name;
+
 	json_filename += ".json";
 	RunGroup runGroup(json_filename);
 	runGroup.load();
@@ -148,13 +155,13 @@ int main (int arg_c, char **arg_v)
 		// select out the foreground runs
 		cout << arg_v[1] << endl;
 		//runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
-		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, arg_v[2]);
+		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, signal_name);
 		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
 		TH1F* h = runGroup.spectrum["full_energy"].foreground;
 		h->Draw("G");
 
 		// select out the background runs
-		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, "background");
+		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
 		//runGroup.spectrum["full_energy"].background->Draw("same");
 
 		// save global canvas to a pdf

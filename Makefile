@@ -40,7 +40,7 @@ Dictionary.cc: NGammaEvent.h LinkDef.h
 	@echo "Generating dictionary $@..."
 	@rootcint -f $@ -c $^
 
-CalibratedEventDictionary.cxx: CalibratedEvent.hh LinkDef.h
+CalibratedEventDictionary.cc: CalibratedEvent.hh LinkDef.h
 	@echo "Generating dictionary $@..."
 	@rootcint -f $@ -c $^
 
