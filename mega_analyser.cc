@@ -173,9 +173,9 @@ int main (int arg_c, char **arg_v)
 	//	canvas->Print(data_pdf_filename.c_str());
 		char filename[1024];
 		//sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
-		sprintf(filename, "%s-%s.full-energy.pdf", arg_v[1], arg_v[2]);
+		sprintf(filename, "%s-%s-%s.full-energy.pdf", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
 		canvas->Print(filename);
-		sprintf(filename, "%s-%s.full-energy.gif", arg_v[1], arg_v[2]);
+		sprintf(filename, "%s-%s-%s.full-energy.gif", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
 		canvas->Print(filename);
 	}
 
