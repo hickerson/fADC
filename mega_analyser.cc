@@ -154,14 +154,17 @@ int main (int arg_c, char **arg_v)
 
 		// select out the foreground runs
 		cout << arg_v[1] << endl;
-		//runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channel, arg_v[1]);
 		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, signal_name);
 		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
-		TH1F* h = runGroup.spectrum["full_energy"].foreground;
-		h->Draw("G");
+		TH1F* foreground_h = runGroup.spectrum["full_energy"].foreground;
 
 		// select out the background runs
 		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
+		TH1F* background_h = runGroup.spectrum["full_energy"].background;
+		foreground_h->Add(background_h, -1);
+
+		foreground_h->Draw("G");
+
 		//runGroup.spectrum["full_energy"].background->Draw("same");
 
 		// save global canvas to a pdf
