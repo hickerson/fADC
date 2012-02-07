@@ -159,20 +159,18 @@ int main (int arg_c, char **arg_v)
 		TH1F* foreground_h = runGroup.spectrum["full_energy"].foreground;
 
 		// select out the background runs
-		runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
-		TH1F* background_h = runGroup.spectrum["full_energy"].background;
-		foreground_h->Add(background_h, -1);
+		if (background_name != "none") {
+			runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
+			TH1F* background_h = runGroup.spectrum["full_energy"].background;
+			foreground_h->Add(background_h, -1);
+		}
 
 		foreground_h->Draw("G");
 
 		//runGroup.spectrum["full_energy"].background->Draw("same");
 
 		// save global canvas to a pdf
-	//	string data_pdf_filename = arg_v[1];
-	//	data_pdf_filename += ".energy.pdf";
-	//	canvas->Print(data_pdf_filename.c_str());
 		char filename[1024];
-		//sprintf(filename, "%s.energy-ch%d.pdf", arg_v[1], channel);
 		sprintf(filename, "%s-%s-%s.full-energy.pdf", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
 		canvas->Print(filename);
 		sprintf(filename, "%s-%s-%s.full-energy.gif", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
