@@ -12,6 +12,7 @@
 #include <TStyle.h>
 #include <TApplication.h>
 #include <TF1.h>
+#include <TMath.h>
 
 // C INCLUDES
 #include <math.h>
@@ -146,6 +147,8 @@ int main (int arg_c, char **arg_v)
 	{
 		// create the global canvas
 		TCanvas* canvas = new TCanvas("canvas", "Energy rate spectrum", 1920/2, 1080/2);
+
+		// select the channels to include in the energy sum
 		vector<int> channels;
 		channels.push_back(16);
 		channels.push_back(17);
@@ -156,18 +159,28 @@ int main (int arg_c, char **arg_v)
 		cout << arg_v[1] << endl;
 		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, signal_name);
 		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
-		TH1F* foreground_h = runGroup.spectrum["full_energy"].foreground;
+		TH1F* foreground = runGroup.spectrum["full_energy"].foreground;
 
 		// select out the background runs
 		if (background_name != "none") {
 			runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
-			TH1F* background_h = runGroup.spectrum["full_energy"].background;
-			foreground_h->Add(background_h, -1);
+			TH1F* background = runGroup.spectrum["full_energy"].background;
+			foreground->Add(background, -1);
+
+			// compute errors 
+			const int bin_count = runGroup.bin_count;
+			for (int i = 0; i < bin_count; i++) {
+				double error_sum = 
+					foreground->GetBinContent(i) *
+					foreground->GetBinContent(i) +
+					background->GetBinContent(i) *
+					background->GetBinContent(i);
+				foreground->SetBinError(i, TMath::Sqrt(error_sum));
+			}
 		}
 
-		foreground_h->Draw("G");
-
-		//runGroup.spectrum["full_energy"].background->Draw("same");
+		// plot results
+		foreground->Draw("G");
 
 		// save global canvas to a pdf
 		char filename[1024];
