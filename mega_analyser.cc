@@ -165,18 +165,19 @@ int main (int arg_c, char **arg_v)
 		if (background_name != "none") {
 			runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
 			TH1F* background = runGroup.spectrum["full_energy"].background;
-			foreground->Add(background, -1);
 
 			// compute errors 
 			const int bin_count = runGroup.bin_count;
 			for (int i = 0; i < bin_count; i++) {
 				double error_sum = 
-					foreground->GetBinContent(i) *
-					foreground->GetBinContent(i) +
-					background->GetBinContent(i) *
-					background->GetBinContent(i);
+					foreground->GetBinError(i) *
+					foreground->GetBinError(i) +
+					background->GetBinError(i) *
+					background->GetBinError(i);
 				foreground->SetBinError(i, TMath::Sqrt(error_sum));
 			}
+
+			foreground->Add(background, -1);
 		}
 
 		// plot results
