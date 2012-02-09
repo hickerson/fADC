@@ -183,6 +183,9 @@ int main (int arg_c, char **arg_v)
 			foreground->Add(background, -1);
 		}
 
+		// fit function
+		foreground->Fit("gaus");
+
 		// plot results
 		foreground->Draw("G");
 
