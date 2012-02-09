@@ -92,6 +92,7 @@ int main (int arg_c, char **arg_v)
 	else
 		background_name = "background";
 	string plot_name = signal_name + " - " + background_name;
+	string spectrum_name = "full_event";
 
 	json_filename += ".json";
 	RunGroup runGroup(json_filename);
@@ -158,14 +159,14 @@ int main (int arg_c, char **arg_v)
 
 		// select out the foreground runs
 		cout << arg_v[1] << endl;
-		runGroup.spectrum["full_energy"].foreground = runGroup.getEnergyHistogram(channels, signal_name);
+		runGroup.spectrum[spectrum_name].foreground = runGroup.getEnergyHistogram(channels, signal_name);
 		cout << "number of spectra is " << runGroup.spectrum.size() << endl;
-		TH1F* foreground = runGroup.spectrum["full_energy"].foreground;
+		TH1F* foreground = runGroup.spectrum[spectrum_name].foreground;
 
 		// select out the background runs
 		if (background_name != "none") {
-			runGroup.spectrum["full_energy"].background = runGroup.getEnergyHistogram(channels, background_name);
-			TH1F* background = runGroup.spectrum["full_energy"].background;
+			runGroup.spectrum[spectrum_name].background = runGroup.getEnergyHistogram(channels, background_name);
+			TH1F* background = runGroup.spectrum[spectrum_name].background;
 
 			// compute errors 
 			const int bin_count = runGroup.bin_count;
@@ -190,7 +191,8 @@ int main (int arg_c, char **arg_v)
 		sprintf(filename, "%s-%s-%s-%s.pdf", json_filename.c_str(), signal_name.c_str(), 
 											 background_name.c_str(), spectrum_name.c_str());
 		canvas->Print(filename);
-		sprintf(filename, "%s-%s-%s-%s.gif", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
+		sprintf(filename, "%s-%s-%s-%s.gif", json_filename.c_str(), signal_name.c_str(), 
+											 background_name.c_str(), spectrum_name.c_str());
 		canvas->Print(filename);
 	}
 
