@@ -56,6 +56,7 @@ int main (int arg_c, char **arg_v)
 		}
 		TString root_data_dir(getenv("UCNb_PROCESSED_DATA_DIR"));
 		TString filename(root_data_dir + "/run" + optarg + ".root");
+		TString fit(...);
 
 		switch (c)
 		{
@@ -177,6 +178,7 @@ int main (int arg_c, char **arg_v)
 				foreground->SetBinError(i, TMath::Sqrt(error_sum));
 			}
 
+			
 			foreground->Add(background, -1);
 		}
 
@@ -185,9 +187,10 @@ int main (int arg_c, char **arg_v)
 
 		// save global canvas to a pdf
 		char filename[1024];
-		sprintf(filename, "%s-%s-%s.full-energy.pdf", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
+		sprintf(filename, "%s-%s-%s-%s.pdf", json_filename.c_str(), signal_name.c_str(), 
+											 background_name.c_str(), spectrum_name.c_str());
 		canvas->Print(filename);
-		sprintf(filename, "%s-%s-%s.full-energy.gif", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
+		sprintf(filename, "%s-%s-%s-%s.gif", json_filename.c_str(), signal_name.c_str(), background_name.c_str());
 		canvas->Print(filename);
 	}
 
