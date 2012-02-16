@@ -105,7 +105,7 @@ int main (int arg_c, char **arg_v)
   	gStyle->SetOptFit(1);
   	gStyle->SetPalette(1);
 
-	runGroup.bin_count = 100;
+	runGroup.bin_count = 500;
 	runGroup.min_area = 0;
 	//runGroup.max_area = 140000;
 	runGroup.max_area = 5000;
@@ -184,7 +184,8 @@ int main (int arg_c, char **arg_v)
 		}
 
 		// fit function
-		foreground->Fit("gaus");
+		//gStyle->SetPalette(3);
+		TFitResult* result = foreground->Fit("gaus", "", "", 1200, 2500);
 
 		// plot results
 		foreground->Draw("G");
